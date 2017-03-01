@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -23,25 +24,60 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cvx-cB-Ibm">
-                                <rect key="frame" x="16" y="304.5" width="343" height="57"/>
+                                <rect key="frame" x="16" y="305" width="343" height="57"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="57" id="tER-JO-EXj"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="38"/>
                                 <state key="normal" title="Generate"/>
                                 <connections>
-                                    <segue destination="hwB-co-1kL" kind="presentation" modalTransitionStyle="flipHorizontal" id="jyK-Pa-a1V"/>
+                                    <segue destination="hwB-co-1kL" kind="presentation" identifier="displayNetworkSegue" modalTransitionStyle="flipHorizontal" id="jyK-Pa-a1V"/>
                                 </connections>
                             </button>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="128" minValue="1" maxValue="5000" translatesAutoresizingMaskIntoConstraints="NO" id="rze-mF-t6J">
+                                <rect key="frame" x="14" y="205" width="347" height="31"/>
+                                <connections>
+                                    <action selector="nodeNumberSliderValueChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="9Ch-Dz-DBN"/>
+                                </connections>
+                            </slider>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Number of Nodes" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yVH-ng-adJ">
+                                <rect key="frame" x="16" y="160" width="343" height="37"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="26"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="25" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yis-uC-Ofo">
+                                <rect key="frame" x="286" y="169" width="73" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="28" id="IDF-hv-BCT"/>
+                                    <constraint firstAttribute="width" constant="73" id="a4t-lU-IC4"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="rze-mF-t6J" firstAttribute="top" secondItem="yVH-ng-adJ" secondAttribute="bottom" constant="8" symbolic="YES" id="37F-T7-e4B"/>
+                            <constraint firstItem="rze-mF-t6J" firstAttribute="leading" secondItem="cvx-cB-Ibm" secondAttribute="leading" id="ADq-RA-SFa"/>
+                            <constraint firstItem="cvx-cB-Ibm" firstAttribute="top" secondItem="rze-mF-t6J" secondAttribute="bottom" constant="70" id="B9L-rr-k3u"/>
+                            <constraint firstItem="yis-uC-Ofo" firstAttribute="trailing" secondItem="rze-mF-t6J" secondAttribute="trailing" id="F3k-lv-XC5"/>
+                            <constraint firstItem="rze-mF-t6J" firstAttribute="trailing" secondItem="cvx-cB-Ibm" secondAttribute="trailing" id="FGy-Gw-DQu"/>
+                            <constraint firstItem="yVH-ng-adJ" firstAttribute="firstBaseline" secondItem="yis-uC-Ofo" secondAttribute="firstBaseline" id="Mla-Tm-aRd"/>
+                            <constraint firstItem="yVH-ng-adJ" firstAttribute="leading" secondItem="rze-mF-t6J" secondAttribute="leading" id="N3K-Bw-NrI"/>
+                            <constraint firstItem="rze-mF-t6J" firstAttribute="top" secondItem="yis-uC-Ofo" secondAttribute="bottom" constant="8" symbolic="YES" id="WaY-cE-3W5"/>
                             <constraint firstItem="cvx-cB-Ibm" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Wp0-Jl-k9F"/>
                             <constraint firstItem="cvx-cB-Ibm" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Y5O-3N-Wpc"/>
+                            <constraint firstItem="yVH-ng-adJ" firstAttribute="trailing" secondItem="yis-uC-Ofo" secondAttribute="trailing" id="kkD-l3-Rfo"/>
                             <constraint firstItem="cvx-cB-Ibm" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="p5K-Tu-9oA"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Menu" id="r83-5b-rvg"/>
+                    <connections>
+                        <outlet property="nodeNumberLabel" destination="yis-uC-Ofo" id="cr0-HE-Zcp"/>
+                        <outlet property="nodeNumberSlider" destination="rze-mF-t6J" id="SbW-by-x3M"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
