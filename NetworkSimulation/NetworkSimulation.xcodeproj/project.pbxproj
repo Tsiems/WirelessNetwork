@@ -8,12 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		162E0FF31E60DE40002A1A13 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E0FF21E60DE40002A1A13 /* AppDelegate.swift */; };
-		162E0FF51E60DE40002A1A13 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E0FF41E60DE40002A1A13 /* ViewController.swift */; };
 		162E0FF81E60DE40002A1A13 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 162E0FF61E60DE40002A1A13 /* Main.storyboard */; };
 		162E0FFA1E60DE40002A1A13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 162E0FF91E60DE40002A1A13 /* Assets.xcassets */; };
 		162E0FFD1E60DE40002A1A13 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 162E0FFB1E60DE40002A1A13 /* LaunchScreen.storyboard */; };
 		162E10081E60DE40002A1A13 /* NetworkSimulationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E10071E60DE40002A1A13 /* NetworkSimulationTests.swift */; };
 		162E10131E60DE40002A1A13 /* NetworkSimulationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E10121E60DE40002A1A13 /* NetworkSimulationUITests.swift */; };
+		162E10211E60DE93002A1A13 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E10201E60DE93002A1A13 /* MenuViewController.swift */; };
+		162E10231E60DEA1002A1A13 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E10221E60DEA1002A1A13 /* DisplayViewController.swift */; };
+		166D7FF61E666EA60067EF6A /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166D7FF51E666EA60067EF6A /* Node.swift */; };
+		166D7FF81E66701D0067EF6A /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166D7FF71E66701D0067EF6A /* DisplayView.swift */; };
+		166D7FFA1E6677370067EF6A /* Edge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166D7FF91E6677370067EF6A /* Edge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +40,6 @@
 /* Begin PBXFileReference section */
 		162E0FEF1E60DE40002A1A13 /* NetworkSimulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkSimulation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		162E0FF21E60DE40002A1A13 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		162E0FF41E60DE40002A1A13 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		162E0FF71E60DE40002A1A13 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		162E0FF91E60DE40002A1A13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		162E0FFC1E60DE40002A1A13 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -47,6 +50,11 @@
 		162E100E1E60DE40002A1A13 /* NetworkSimulationUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkSimulationUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		162E10121E60DE40002A1A13 /* NetworkSimulationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSimulationUITests.swift; sourceTree = "<group>"; };
 		162E10141E60DE40002A1A13 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		162E10201E60DE93002A1A13 /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
+		162E10221E60DEA1002A1A13 /* DisplayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
+		166D7FF51E666EA60067EF6A /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		166D7FF71E66701D0067EF6A /* DisplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
+		166D7FF91E6677370067EF6A /* Edge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Edge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,7 +106,11 @@
 			isa = PBXGroup;
 			children = (
 				162E0FF21E60DE40002A1A13 /* AppDelegate.swift */,
-				162E0FF41E60DE40002A1A13 /* ViewController.swift */,
+				162E10201E60DE93002A1A13 /* MenuViewController.swift */,
+				166D7FF51E666EA60067EF6A /* Node.swift */,
+				166D7FF91E6677370067EF6A /* Edge.swift */,
+				162E10221E60DEA1002A1A13 /* DisplayViewController.swift */,
+				166D7FF71E66701D0067EF6A /* DisplayView.swift */,
 				162E0FF61E60DE40002A1A13 /* Main.storyboard */,
 				162E0FF91E60DE40002A1A13 /* Assets.xcassets */,
 				162E0FFB1E60DE40002A1A13 /* LaunchScreen.storyboard */,
@@ -262,8 +274,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				162E0FF51E60DE40002A1A13 /* ViewController.swift in Sources */,
+				162E10211E60DE93002A1A13 /* MenuViewController.swift in Sources */,
 				162E0FF31E60DE40002A1A13 /* AppDelegate.swift in Sources */,
+				166D7FFA1E6677370067EF6A /* Edge.swift in Sources */,
+				162E10231E60DEA1002A1A13 /* DisplayViewController.swift in Sources */,
+				166D7FF81E66701D0067EF6A /* DisplayView.swift in Sources */,
+				166D7FF61E666EA60067EF6A /* Node.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,6 +530,7 @@
 				162E10191E60DE40002A1A13 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		162E101A1E60DE40002A1A13 /* Build configuration list for PBXNativeTarget "NetworkSimulationTests" */ = {
 			isa = XCConfigurationList;
@@ -522,6 +539,7 @@
 				162E101C1E60DE40002A1A13 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		162E101D1E60DE40002A1A13 /* Build configuration list for PBXNativeTarget "NetworkSimulationUITests" */ = {
 			isa = XCConfigurationList;
@@ -530,6 +548,7 @@
 				162E101F1E60DE40002A1A13 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
