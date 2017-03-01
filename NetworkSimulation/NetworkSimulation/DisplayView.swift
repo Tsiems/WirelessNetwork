@@ -8,13 +8,15 @@
 
 import UIKit
 
+
 class DisplayView: UIView {
     
     var NODE_SIZE:Double = 5.0
     var EDGE_WIDTH:Double = 1.0
     
-    var nodes:[Node] = [Node(x:50,y:100),Node(x:50,y:150),Node(x:100,y:100), Node(x:100,y:150)]
-    var edges:[Edge] = [Edge(x1:50,y1:100,x2:100,y2:150),Edge(x1:100,y1:100,x2:50,y2:150)]
+    var nodes:[Node] = []
+    var edges:[Edge] = []
+    
     
     override func draw(_ rect: CGRect)
     {
@@ -44,8 +46,8 @@ class DisplayView: UIView {
         let context = UIGraphicsGetCurrentContext()
         context?.setLineWidth(CGFloat(EDGE_WIDTH))
         context?.setStrokeColor(obj.color.cgColor)
-        context?.move(to: CGPoint(x: obj.x1, y: obj.y1))
-        context?.addLine(to: CGPoint(x: obj.x2, y: obj.y2))
+        context?.move(to: CGPoint(x: obj.node1.x, y: obj.node1.y))
+        context?.addLine(to: CGPoint(x: obj.node2.x, y: obj.node2.y))
         context?.strokePath()
     }
 }

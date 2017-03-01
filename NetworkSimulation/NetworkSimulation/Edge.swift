@@ -9,17 +9,13 @@
 import UIKit
 
 class Edge: NSObject {
-    var x1: Double = 0.0
-    var y1: Double = 0.0
-    var x2: Double = 0.0
-    var y2: Double = 0.0
+    var node1:Node
+    var node2:Node
     var color: UIColor = UIColor.red
     
-    init(x1:Double,y1:Double,x2:Double,y2:Double,color:UIColor = UIColor.red) {
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+    init(node1:Node,node2:Node,color:UIColor = UIColor.red) {
+        self.node1 = node1
+        self.node2 = node2
         self.color = color
     }
 }
