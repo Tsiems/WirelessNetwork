@@ -34,7 +34,7 @@
                                     <segue destination="hwB-co-1kL" kind="presentation" identifier="displayNetworkSegue" modalTransitionStyle="flipHorizontal" id="jyK-Pa-a1V"/>
                                 </connections>
                             </button>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="128" minValue="1" maxValue="5000" translatesAutoresizingMaskIntoConstraints="NO" id="rze-mF-t6J">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="128" minValue="1" maxValue="64000" translatesAutoresizingMaskIntoConstraints="NO" id="rze-mF-t6J">
                                 <rect key="frame" x="14" y="205" width="347" height="31"/>
                                 <connections>
                                     <action selector="nodeNumberSliderValueChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="9Ch-Dz-DBN"/>
