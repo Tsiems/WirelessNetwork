@@ -34,9 +34,11 @@ class DisplayViewController: UIViewController {
     var node_size = 2.0
     var edge_width = 0.2
     
-    var graphAdjList:[Int:[Node]] = [:]
+    var graphAdjList:[[Node]] = []
 
     @IBOutlet weak var drawView: DisplayView!
+    @IBOutlet weak var showNodesSwitch: UISwitch!
+    @IBOutlet weak var showEdgesSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,8 +64,8 @@ class DisplayViewController: UIViewController {
                 let nodes = generateRandomNodesInSquare(num: nodeCount)
                 CURRENT_NODES = nodes
             }
-            let edges:[Edge] = generateEdgesBruteForce(nodes: CURRENT_NODES, r: connectionDistance)
-            
+//            var edges:[Edge] = generateEdgesBruteForce(nodes: CURRENT_NODES, r: connectionDistance)
+            let edges:[Edge] = generateEdgesUsingCellMethod(nodes: CURRENT_NODES, r: connectionDistance)
             CURRENT_EDGES = edges
         }
         
@@ -162,24 +164,132 @@ class DisplayViewController: UIViewController {
             for j in i+1 ..< nodes.count {
                 if sqrt( pow(nodes[i].x-nodes[j].x,2) + pow(nodes[i].y-nodes[j].y,2)) <= r {
                     edges.append( Edge(node1: nodes[i],node2: nodes[j]))
+//                    print("Connecting for real: ",nodes[i],nodes[j])
                 }
             }
         }
+        print(edges.count)
         
         return edges
     }
+    
+    func generateEdgesUsingCellMethod(nodes:[Node], r:Double) -> [Edge] {
+        // WARNING: this is very slow and is O(n^2)
+        var edges:[Edge] = []
+        
+        let rowCount = Int(ceil(1.0/r))
+        
+        var cells:[[[Node]]] = [[[Node]]](repeating: [[Node]](repeating: [], count: rowCount ), count: rowCount)
+        
+        for node in nodes {
+            cells[ Int(node.x/r) ][ Int(node.y/r) ].append(node)
+        }
+        
+        for r in cells {
+            for c in r {
+//                print(c)
+            }
+        }
+        
+        //for each cell
+        var i = 0
+        while (i < rowCount) {
+            var j = 0
+            while (j < rowCount) {
+                var testNodes:[Node] = []
+                if i+1 < rowCount && j+1 < rowCount {
+                    let firstHalf = cells[i+1][j]
+                    let secondHalf = cells[i][j+1] + cells[i+1][j+1]
+                    //test nodes from adjacent cells
+                    testNodes.append(contentsOf:firstHalf + secondHalf)
+                    
+                    if j > 0 {
+                        testNodes.append(contentsOf:cells[i+1][j-1])
+                    }
+                } else if i+1 < rowCount {
+                    testNodes.append(contentsOf: cells[i+1][j])
+                    
+                    if j > 0 {
+                        testNodes.append(contentsOf:cells[i+1][j-1])
+                    }
+                } else if j+1 < rowCount {
+                    testNodes.append(contentsOf: cells[i][j+1])
+                }
+                
+//                print("TESTING: ",testNodes)
+
+                for node in cells[i][j] {
+                    var l = 0
+                    while (l < testNodes.count) {
+                        if node.id != testNodes[l].id &&
+                                sqrt( pow(node.x-testNodes[l].x,2) + pow(node.y-testNodes[l].y,2)) <= r {
+                            edges.append( Edge(node1: node,node2: testNodes[l]))
+//                            print("Connecting: ",node,testNodes[l])
+                        }
+                        l += 1
+                    }
+                }
+                
+                var k = 0
+                while k < cells[i][j].count-1 {
+                    var l = k+1
+                    while l < cells[i][j].count {
+                        if sqrt( pow(cells[i][j][k].x-cells[i][j][l].x,2) + pow(cells[i][j][k].y-cells[i][j][l].y,2)) <= r {
+                            edges.append( Edge(node1: cells[i][j][k],node2: cells[i][j][l]))
+//                            print("Connecting: ",cells[i][j][k],cells[i][j][l])
+                        }
+                        l += 1
+                    }
+                    k += 1
+                }
+                j += 1
+            }
+            
+            // NEED TO CHECK THE ENDS OF ROWS AND COLUMNS WITH THEMSELVES
+            i += 1
+        }
+        
+        print(edges.count)
+        
+        
+//        for i in 0 ..< nodes.count-1 {
+//            for j in i+1 ..< nodes.count {
+//                if sqrt( pow(nodes[i].x-nodes[j].x,2) + pow(nodes[i].y-nodes[j].y,2)) <= r {
+//                    edges.append( Edge(node1: nodes[i],node2: nodes[j]))
+//                }
+//            }
+//        }
+        
+        return edges
+    }
+    
+    func findDifference(list1:[Edge],list2:[Edge]) {
+        for i1 in list1 {
+            var found = false
+            for i2 in list2 {
+                if (i1.node1.id == i2.node1.id && i1.node2.id == i2.node2.id) || (i1.node1.id == i2.node2.id && i1.node2.id == i2.node1.id){
+                    found = true
+                    break
+                }
+            }
+            if !found {
+                let r = connectionDistance
+                print(i1.node1,i1.node2, "    ", Int(i1.node1.x/r), Int(i1.node1.y/r), " --- ", Int(i1.node2.x/r), Int(i1.node2.y/r))
+            }
+        }
+    }
 
 
-    func getAdjacencyList(nodes:[Node],edges:[Edge]) -> [Int:[Node]]{
-        var adjList:[Int:[Node]] = [:]
+    func getAdjacencyList(nodes:[Node],edges:[Edge]) -> [[Node]]{
+        var adjList:[[Node]] = [[Node]](repeating: [], count: nodes.count)
         
         for node in nodes {
             adjList[node.id] = [node]
         }
         
         for edge in edges {
-            adjList[edge.node1.id]?.append(edge.node2)
-            adjList[edge.node2.id]?.append(edge.node1)
+            adjList[edge.node1.id].append(edge.node2)
+            adjList[edge.node2.id].append(edge.node1)
         }
         
 //        print(adjList)
@@ -187,14 +297,95 @@ class DisplayViewController: UIViewController {
         return adjList
     }
     
-    func colorGraph(adjList: [Int:[Node]]) {
+    func colorGraph(adjList: [[Node]]) {
+//        let sortedArray = arr.sort { ($0[0] as? Int) < ($1[0] as? Int) }
+//        var edges:[(Int,Int)] = []
+        var colors:[Int] = []
+        var colorValues:[UIColor] = []
         
-        // TODO: Need to do real graph coloring
+        var colorsAssigned:[Int] = [Int](repeating: -1, count: adjList.count)
+        
+        for list in adjList {
+            var colorsTaken:[Int] = []
+            for node in list {
+                colorsTaken.append(colorsAssigned[node.id])
+            }
+            var k = 0
+            while k < colors.count {
+                if colorsTaken.contains(colors[k]) {
+                    k += 1
+                } else {
+                    colorsAssigned[list[0].id] = colors[k]
+                    list[0].color = colorValues[k]
+                    break
+                }
+            }
+            if k == colors.count {
+                colorsAssigned[list[0].id] = colors.count
+                colors.append(colors.count)
+                let newColor = UIColor(colorLiteralRed: getRandomFloat(), green: getRandomFloat(), blue: getRandomFloat(), alpha: 1.0)
+                colorValues.append(newColor)
+                list[0].color = newColor
+            }
+        }
+        
+        print(colorsAssigned)
+        
+
+        
+        
+        var adjListCopy = adjList
+        var removedNodes:[Int] = []
+        var i = 0
+        
+        
+//        // VERY SLOW VERSION!
+//        while i < adjListCopy.count {
+//            var minListCount:Int = Int(INT_MAX)
+//            var minId = -1
+//            
+//            //find min
+//            for list in adjListCopy {
+//                if list.count < minListCount && !removedNodes.contains(list[0].id) {
+//                    minId = list[0].id
+//                    minListCount = list.count
+//                }
+//            }
+//            
+//            removedNodes.append(minId)
+//            for node in adjListCopy[minId] {
+//                if node.id != minId {
+//                    var j = 0
+//                    
+//                    while j < adjListCopy[node.id].count {
+//                        if adjListCopy[node.id][j].id == minId {
+//                            break
+//                        }
+//                        
+//                        j += 1
+//                    }
+//                    adjListCopy[node.id].remove(at: j)
+//                }
+//            }
+//            
+//            i += 1
+//        }
+        
+        print(removedNodes)
+        
+        //sort adjacency list
+        
+        //Loop until list is empty
+            //pop the lowest into new list
+        
+            //update all values it was connected to (or sort again but that's slow)
+        
+        
         var newNodes:[Node] = []
-        for k in adjList.keys {
-            adjList[k]?[0].color = UIColor(colorLiteralRed: getRandomFloat(), green: getRandomFloat(), blue: getRandomFloat(), alpha: 1.0)
+        for k in adjList {
+//            k[0].color = UIColor(colorLiteralRed: getRandomFloat(), green: getRandomFloat(), blue: getRandomFloat(), alpha: 1.0)
 //            print(adjList[k]?[0].color)
-            newNodes.append((adjList[k]?[0])!)
+            newNodes.append((k[0]))
         }
         drawView.nodes = newNodes
         drawView.setNeedsDisplay()
@@ -204,14 +395,24 @@ class DisplayViewController: UIViewController {
     @IBAction func pressedColorGraphButton(_ sender: Any) {
         colorGraph(adjList: self.graphAdjList)
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    @IBAction func showValueChanged(_ sender: Any) {
+        self.shouldShowNodes = self.showNodesSwitch.isOn
+        self.shouldShowEdges = self.showEdgesSwitch.isOn
+        drawView.shouldShowNodes = self.shouldShowNodes
+        drawView.shouldShowEdges = self.shouldShowEdges
+//        if self.shouldShowEdges {
+//            let edges:[Edge] = generateEdgesBruteForce(nodes: CURRENT_NODES, r: connectionDistance)
+//            
+////            findDifference(list1: edges, list2: CURRENT_EDGES)
+//            CURRENT_EDGES = edges
+//            drawView.edges = CURRENT_EDGES
+//        } else {
+//            let edges:[Edge] = generateEdgesUsingCellMethod(nodes: CURRENT_NODES, r: connectionDistance)
+//            CURRENT_EDGES = edges
+//            drawView.edges = CURRENT_EDGES
+//        }
+        drawView.setNeedsDisplay()
     }
-    */
+
 
 }

@@ -36,7 +36,6 @@ class DisplayView: UIView {
     
     override func draw(_ rect: CGRect)
     {
-        print(rect)
         xMax = Double(rect.size.width)
         yMax = Double(rect.size.height)
         
@@ -80,7 +79,6 @@ class DisplayView: UIView {
         ctx?.setFillColor(obj.color.cgColor)
         ctx?.setStrokeColor(obj.color.cgColor)
         ctx?.setLineWidth(CGFloat(NODE_SIZE))
-        print(obj.color)
         
         let rectangle = CGRect(x: xMax*obj.x-NODE_SIZE/2, y: yMax*obj.y-NODE_SIZE/2, width: NODE_SIZE, height: NODE_SIZE)
         ctx?.addEllipse(in: rectangle)

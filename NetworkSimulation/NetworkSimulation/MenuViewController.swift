@@ -34,8 +34,6 @@ class MenuViewController: UIViewController {
     @IBOutlet weak var networkModelControl: UISegmentedControl!
     @IBOutlet weak var nodeNumberSlider: UISlider!
     @IBOutlet weak var nodeNumberLabel: UILabel!
-    @IBOutlet weak var showNodesSwitch: UISwitch!
-    @IBOutlet weak var showEdgesSwitch: UISwitch!
     @IBOutlet weak var newValuesSwitch: UISwitch!
     
     @IBOutlet weak var adjacencySlider: UISlider!
@@ -120,8 +118,6 @@ class MenuViewController: UIViewController {
             
             
             print(vc.averageDegree)
-            vc.shouldShowNodes = self.showNodesSwitch.isOn
-            vc.shouldShowEdges = self.showEdgesSwitch.isOn
             vc.shouldGenerateNewValues = self.newValuesSwitch.isOn
             
             
