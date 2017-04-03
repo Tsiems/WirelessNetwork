@@ -11,6 +11,8 @@ import UIKit
 var CURRENT_NODES:[Node] = []
 var CURRENT_EDGES:[Edge] = []
 var CURRENT_CONNECTION_DISTANCE = 0.08
+var TIME_TO_CREATE_GRAPH = 0.0
+var CURRENT_ADJACENCY_LIST:[[Node]] = []
 //var CURRENT_MODEL_INDEX:INT = 0
 
 func getRandomDouble() -> Double {
@@ -55,6 +57,7 @@ class DisplayViewController: UIViewController {
         
         CURRENT_CONNECTION_DISTANCE = connectionDistance
         
+        let startTime = Date()
         if shouldGenerateNewValues {
             if networkModel == "Disk" {
                 let nodes = generateRandomNodesInDisk(num: nodeCount)
@@ -69,7 +72,12 @@ class DisplayViewController: UIViewController {
             CURRENT_EDGES = edges
         }
         
+        let graphCreatedTime = Date()
+        
+        TIME_TO_CREATE_GRAPH = graphCreatedTime.timeIntervalSince(startTime)
+        
         self.graphAdjList = getAdjacencyList(nodes: CURRENT_NODES, edges: CURRENT_EDGES)
+        CURRENT_ADJACENCY_LIST = self.graphAdjList
         
         drawView.nodes = CURRENT_NODES
         drawView.edges = CURRENT_EDGES
@@ -146,8 +154,8 @@ class DisplayViewController: UIViewController {
             let r = sqrt(getRandomDouble())
             let degree = getRandomDouble()*360
             
-            let x = r * cos(degree)
-            let y = r * sin(degree)
+            let x = (r * cos(degree) + 1.0)/2.0
+            let y = (r * sin(degree) + 1.0)/2.0
             
             nodes.append( Node(x:x,y:y, id: current_id ) )
             current_id += 1
@@ -185,22 +193,18 @@ class DisplayViewController: UIViewController {
             cells[ Int(node.x/r) ][ Int(node.y/r) ].append(node)
         }
         
-        for r in cells {
-            for c in r {
-//                print(c)
-            }
-        }
-        
         //for each cell
         var i = 0
         while (i < rowCount) {
             var j = 0
             while (j < rowCount) {
                 var testNodes:[Node] = []
+                
+                //find adjacent cells
                 if i+1 < rowCount && j+1 < rowCount {
                     let firstHalf = cells[i+1][j]
                     let secondHalf = cells[i][j+1] + cells[i+1][j+1]
-                    //test nodes from adjacent cells
+                    
                     testNodes.append(contentsOf:firstHalf + secondHalf)
                     
                     if j > 0 {
@@ -216,27 +220,25 @@ class DisplayViewController: UIViewController {
                     testNodes.append(contentsOf: cells[i][j+1])
                 }
                 
-//                print("TESTING: ",testNodes)
 
+                // test nodes in adjacent cells
                 for node in cells[i][j] {
                     var l = 0
                     while (l < testNodes.count) {
-                        if node.id != testNodes[l].id &&
-                                sqrt( pow(node.x-testNodes[l].x,2) + pow(node.y-testNodes[l].y,2)) <= r {
+                        if sqrt( pow(node.x-testNodes[l].x,2) + pow(node.y-testNodes[l].y,2)) <= r {
                             edges.append( Edge(node1: node,node2: testNodes[l]))
-//                            print("Connecting: ",node,testNodes[l])
                         }
                         l += 1
                     }
                 }
                 
+                // test nodes within
                 var k = 0
                 while k < cells[i][j].count-1 {
                     var l = k+1
                     while l < cells[i][j].count {
                         if sqrt( pow(cells[i][j][k].x-cells[i][j][l].x,2) + pow(cells[i][j][k].y-cells[i][j][l].y,2)) <= r {
                             edges.append( Edge(node1: cells[i][j][k],node2: cells[i][j][l]))
-//                            print("Connecting: ",cells[i][j][k],cells[i][j][l])
                         }
                         l += 1
                     }
@@ -244,8 +246,6 @@ class DisplayViewController: UIViewController {
                 }
                 j += 1
             }
-            
-            // NEED TO CHECK THE ENDS OF ROWS AND COLUMNS WITH THEMSELVES
             i += 1
         }
         
@@ -412,6 +412,36 @@ class DisplayViewController: UIViewController {
 //            drawView.edges = CURRENT_EDGES
 //        }
         drawView.setNeedsDisplay()
+    }
+    
+    @IBAction func unwindToDisplay(segue: UIStoryboardSegue) {
+        print("Back at display")
+    }
+    
+    
+    // MARK: - Navigation
+    
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+        if segue.identifier == "showStatsSegue" {
+            let vc = (segue.destination as! UINavigationController).topViewController as! StatsTableViewController
+            
+            var statistics:[(String,String)] = []
+            
+            statistics.append(("Node Count",String(CURRENT_NODES.count)))
+            statistics.append(("Edge Count",String(CURRENT_EDGES.count)))
+            statistics.append(("Connection Distance (R)",String(round(1000*CURRENT_CONNECTION_DISTANCE)/1000)))
+            statistics.append(("Average Degree",String(round(1000*2.0*Double(CURRENT_EDGES.count)/Double(CURRENT_NODES.count))/1000)))
+            
+            statistics.append(("Generate Graph (Time)",String(round(1000*TIME_TO_CREATE_GRAPH)/1000)))
+            
+            vc.statistics = statistics
+
+            
+            //            CURRENT_MODEL_INDEX = self.networkModelControl.selectedSegmentIndex
+        }
     }
 
 

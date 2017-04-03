@@ -54,7 +54,8 @@ class DisplayView: UIView {
             else if model == "Disk" {
 //                var center = {x:y
                 for node in nodes {
-                    drawNodeInDisk(obj: node)
+//                    drawNodeInDisk(obj: node)
+                    drawNodeInSquare(obj: node)
                 }
             }
         }
@@ -68,7 +69,8 @@ class DisplayView: UIView {
             }
             if model == "Disk" {
                 for edge in edges {
-                    drawEdgeInDisk(obj: edge)
+//                    drawEdgeInDisk(obj: edge)
+                    drawEdgeInSquare(obj: edge)
                 }
             }
         }

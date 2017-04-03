@@ -15,9 +15,14 @@
 		162E10131E60DE40002A1A13 /* NetworkSimulationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E10121E60DE40002A1A13 /* NetworkSimulationUITests.swift */; };
 		162E10211E60DE93002A1A13 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E10201E60DE93002A1A13 /* MenuViewController.swift */; };
 		162E10231E60DEA1002A1A13 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E10221E60DEA1002A1A13 /* DisplayViewController.swift */; };
+		163C05041E91731300D7C62C /* StatsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 163C05031E91731300D7C62C /* StatsTableViewController.swift */; };
+		163C05061E91764C00D7C62C /* StatsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 163C05051E91764C00D7C62C /* StatsTableViewCell.swift */; };
 		166D7FF61E666EA60067EF6A /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166D7FF51E666EA60067EF6A /* Node.swift */; };
 		166D7FF81E66701D0067EF6A /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166D7FF71E66701D0067EF6A /* DisplayView.swift */; };
 		166D7FFA1E6677370067EF6A /* Edge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166D7FF91E6677370067EF6A /* Edge.swift */; };
+		16DD8C981E918E720053B103 /* GraphsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DD8C971E918E720053B103 /* GraphsViewController.swift */; };
+		16DD8CA31E91BD270053B103 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16DD8CA01E918FD70053B103 /* Charts.framework */; };
+		16DD8CA41E91BD270053B103 /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 16DD8CA01E918FD70053B103 /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +40,42 @@
 			remoteGlobalIDString = 162E0FEE1E60DE40002A1A13;
 			remoteInfo = NetworkSimulation;
 		};
+		16DD8C9F1E918FD70053B103 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 16DD8C9A1E918FD70053B103 /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 06165F241D8110E600722320;
+			remoteInfo = Charts;
+		};
+		16DD8CA11E918FD70053B103 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 16DD8C9A1E918FD70053B103 /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 06165F2E1D8110E600722320;
+			remoteInfo = ChartsTests;
+		};
+		16DD8CA51E91BD270053B103 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 16DD8C9A1E918FD70053B103 /* Charts.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 06165F231D8110E600722320;
+			remoteInfo = Charts;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		16DD8CA71E91BD270053B103 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				16DD8CA41E91BD270053B103 /* Charts.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		162E0FEF1E60DE40002A1A13 /* NetworkSimulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkSimulation.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,9 +92,13 @@
 		162E10141E60DE40002A1A13 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		162E10201E60DE93002A1A13 /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		162E10221E60DEA1002A1A13 /* DisplayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
+		163C05031E91731300D7C62C /* StatsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsTableViewController.swift; sourceTree = "<group>"; };
+		163C05051E91764C00D7C62C /* StatsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StatsTableViewCell.swift; path = ../StatsTableViewCell.swift; sourceTree = "<group>"; };
 		166D7FF51E666EA60067EF6A /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		166D7FF71E66701D0067EF6A /* DisplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
 		166D7FF91E6677370067EF6A /* Edge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Edge.swift; sourceTree = "<group>"; };
+		16DD8C971E918E720053B103 /* GraphsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphsViewController.swift; sourceTree = "<group>"; };
+		16DD8C9A1E918FD70053B103 /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = "../../Charts-master/Charts.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +106,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16DD8CA31E91BD270053B103 /* Charts.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,12 +150,16 @@
 		162E0FF11E60DE40002A1A13 /* NetworkSimulation */ = {
 			isa = PBXGroup;
 			children = (
+				16DD8C9A1E918FD70053B103 /* Charts.xcodeproj */,
 				162E0FF21E60DE40002A1A13 /* AppDelegate.swift */,
 				162E10201E60DE93002A1A13 /* MenuViewController.swift */,
 				166D7FF51E666EA60067EF6A /* Node.swift */,
 				166D7FF91E6677370067EF6A /* Edge.swift */,
 				162E10221E60DEA1002A1A13 /* DisplayViewController.swift */,
 				166D7FF71E66701D0067EF6A /* DisplayView.swift */,
+				163C05031E91731300D7C62C /* StatsTableViewController.swift */,
+				163C05051E91764C00D7C62C /* StatsTableViewCell.swift */,
+				16DD8C971E918E720053B103 /* GraphsViewController.swift */,
 				162E0FF61E60DE40002A1A13 /* Main.storyboard */,
 				162E0FF91E60DE40002A1A13 /* Assets.xcassets */,
 				162E0FFB1E60DE40002A1A13 /* LaunchScreen.storyboard */,
@@ -137,6 +186,15 @@
 			path = NetworkSimulationUITests;
 			sourceTree = "<group>";
 		};
+		16DD8C9B1E918FD70053B103 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				16DD8CA01E918FD70053B103 /* Charts.framework */,
+				16DD8CA21E918FD70053B103 /* ChartsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -147,10 +205,12 @@
 				162E0FEB1E60DE40002A1A13 /* Sources */,
 				162E0FEC1E60DE40002A1A13 /* Frameworks */,
 				162E0FED1E60DE40002A1A13 /* Resources */,
+				16DD8CA71E91BD270053B103 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				16DD8CA61E91BD270053B103 /* PBXTargetDependency */,
 			);
 			name = NetworkSimulation;
 			productName = NetworkSimulation;
@@ -233,6 +293,12 @@
 			mainGroup = 162E0FE61E60DE40002A1A13;
 			productRefGroup = 162E0FF01E60DE40002A1A13 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 16DD8C9B1E918FD70053B103 /* Products */;
+					ProjectRef = 16DD8C9A1E918FD70053B103 /* Charts.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				162E0FEE1E60DE40002A1A13 /* NetworkSimulation */,
@@ -241,6 +307,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		16DD8CA01E918FD70053B103 /* Charts.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Charts.framework;
+			remoteRef = 16DD8C9F1E918FD70053B103 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		16DD8CA21E918FD70053B103 /* ChartsTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = ChartsTests.xctest;
+			remoteRef = 16DD8CA11E918FD70053B103 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		162E0FED1E60DE40002A1A13 /* Resources */ = {
@@ -276,9 +359,12 @@
 			files = (
 				162E10211E60DE93002A1A13 /* MenuViewController.swift in Sources */,
 				162E0FF31E60DE40002A1A13 /* AppDelegate.swift in Sources */,
+				163C05041E91731300D7C62C /* StatsTableViewController.swift in Sources */,
 				166D7FFA1E6677370067EF6A /* Edge.swift in Sources */,
 				162E10231E60DEA1002A1A13 /* DisplayViewController.swift in Sources */,
+				163C05061E91764C00D7C62C /* StatsTableViewCell.swift in Sources */,
 				166D7FF81E66701D0067EF6A /* DisplayView.swift in Sources */,
+				16DD8C981E918E720053B103 /* GraphsViewController.swift in Sources */,
 				166D7FF61E666EA60067EF6A /* Node.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -311,6 +397,11 @@
 			isa = PBXTargetDependency;
 			target = 162E0FEE1E60DE40002A1A13 /* NetworkSimulation */;
 			targetProxy = 162E100F1E60DE40002A1A13 /* PBXContainerItemProxy */;
+		};
+		16DD8CA61E91BD270053B103 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Charts;
+			targetProxy = 16DD8CA51E91BD270053B103 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -430,6 +521,7 @@
 		162E10181E60DE40002A1A13 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 788J8M5NBX;
 				INFOPLIST_FILE = NetworkSimulation/Info.plist;
@@ -443,6 +535,7 @@
 		162E10191E60DE40002A1A13 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 788J8M5NBX;
 				INFOPLIST_FILE = NetworkSimulation/Info.plist;

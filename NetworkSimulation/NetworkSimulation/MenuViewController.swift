@@ -114,6 +114,7 @@ class MenuViewController: UIViewController {
                 vc.averageDegree = Double(vc.nodeCount)*Double.pi*vc.connectionDistance*vc.connectionDistance
             } else if vc.networkModel == "Disk" {
                 vc.averageDegree = Double(vc.nodeCount)*vc.connectionDistance*vc.connectionDistance
+                vc.connectionDistance = vc.connectionDistance/2
             }
             
             
