@@ -12,7 +12,7 @@ class StatsTableViewController: UITableViewController {
     
     var statistics:[(String,String)] = []
     
-    var graphs:[String] = ["Degree Distribution"]
+    var graphs:[String] = ["Degree Distribution","Color Frequency","Degree When Deleted"]
     
     var graphData:[Double] = []
     var graphTitle:String = ""
@@ -126,6 +126,34 @@ class StatsTableViewController: UITableViewController {
                                 break
                             }
                             i -= 1
+                        }
+                    case "Color Frequency":
+                        self.graphAxisLabel = "Vertex Count"
+                        self.graphDescription = "Frequency of Verticies By Color"
+                        self.graphData = [Double](repeating: 0.0, count: CURRENT_COLORS_ASSIGNED.count)
+                        for num in CURRENT_COLORS_ASSIGNED {
+                            self.graphData[num] += 1.0
+                        }
+                        var i = self.graphData.count-1
+                        
+                        while i > -1 {
+                            if self.graphData[i] == 0.0 {
+                                _ = self.graphData.popLast()
+                            }
+                            else {
+                                break
+                            }
+                            i -= 1
+                        }
+                    case "Degree When Deleted":
+                        self.graphAxisLabel = "Degree"
+                        self.graphDescription = "Degree When Each Vertex was Deleted in the Smallest-Last Coloring Algorithm"
+                        
+                        self.graphData = [Double](repeating: 0.0, count: DEGREE_WHEN_DELETED.count)
+                        var i = 0
+                        for val in DEGREE_WHEN_DELETED {
+                            self.graphData[i] = Double(val)
+                            i += 1
                         }
 
                     default:

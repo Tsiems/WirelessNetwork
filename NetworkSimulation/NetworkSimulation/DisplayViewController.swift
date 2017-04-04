@@ -12,7 +12,10 @@ var CURRENT_NODES:[Node] = []
 var CURRENT_EDGES:[Edge] = []
 var CURRENT_CONNECTION_DISTANCE = 0.08
 var TIME_TO_CREATE_GRAPH = 0.0
+var TIME_TO_COLOR_GRAPH = 0.0
 var CURRENT_ADJACENCY_LIST:[[Node]] = []
+var CURRENT_COLORS_ASSIGNED:[Int] = []
+var DEGREE_WHEN_DELETED:[Int] = []
 //var CURRENT_MODEL_INDEX:INT = 0
 
 func getRandomDouble() -> Double {
@@ -36,6 +39,8 @@ class DisplayViewController: UIViewController {
     var node_size = 2.0
     var edge_width = 0.2
     
+    var colorStats:[(String,String)] = []
+    
     var graphAdjList:[[Node]] = []
 
     @IBOutlet weak var drawView: DisplayView!
@@ -47,9 +52,9 @@ class DisplayViewController: UIViewController {
 
 //        var nodes:[Node] = [Node(x:50,y:100),Node(x:50,y:150),Node(x:100,y:100), Node(x:100,y:150)]
         
-        let screenSize = UIScreen.main.bounds
-        let screenWidth = Double(screenSize.width)
-        let screenHeight = Double(screenSize.height)
+     //   let screenSize = UIScreen.main.bounds
+      //  let screenWidth = Double(screenSize.width)
+        //let screenHeight = Double(screenSize.height)
         
         
 //        let nodes = generateRandomNodesOnRect(num: nodeCount, xMin: 50, yMin: 100, xMax: 50+squareEdgeSize, yMax: 100+squareEdgeSize)
@@ -297,7 +302,57 @@ class DisplayViewController: UIViewController {
         return adjList
     }
     
-    func colorGraph(adjList: [[Node]]) {
+    func sortBySmallestLastDegree(adjList: [[Node]]) -> [[Node]] {
+        colorStats = []
+        DEGREE_WHEN_DELETED = []
+        
+        var newList:[[Node]] = []
+        
+        
+        var adjDict:[Int:([Node],Int)] = [:]
+        
+        var maxDegree = 0
+        var totalDegree = 0
+        for list in adjList {
+            adjDict[list[0].id] = (list,list.count)
+            if list.count-1 > maxDegree {
+                maxDegree = list.count-1
+            }
+            totalDegree += list.count-1
+        }
+        
+        while adjDict.count > 0 {
+            var minDegree = 1000000
+            var minDegreeId = -1
+            for (k,v) in adjDict {
+                if v.1 < minDegree {
+                    minDegree = v.1
+                    minDegreeId = k
+                }
+            }
+            
+            let minVal = adjDict.removeValue(forKey: minDegreeId)
+            newList.append(minVal!.0)
+            DEGREE_WHEN_DELETED.append(minVal!.1 - 1)
+            for node in minVal!.0 {
+                if adjDict[node.id] != nil {
+                    adjDict[node.id]!.1 -= 1
+                }
+            }
+        }
+        
+        colorStats.append( ("Min Degree",String(DEGREE_WHEN_DELETED[0])) )
+        colorStats.append( ("Avg Degree",String( round( Double( totalDegree ) / Double( newList.count ) * 1000 ) / 1000 ) ) )
+        colorStats.append( ("Max Degree",String(maxDegree)) )
+        colorStats.append( ( "Max Degree when Deleted",String( DEGREE_WHEN_DELETED.max()!  ) ) )
+        
+        print("STATS",colorStats)
+        newList.reverse()
+        
+        return newList
+    }
+    
+    func colorGraph(adjList: [[Node]]) -> [Int] {
 //        let sortedArray = arr.sort { ($0[0] as? Int) < ($1[0] as? Int) }
 //        var edges:[(Int,Int)] = []
         var colors:[Int] = []
@@ -329,14 +384,14 @@ class DisplayViewController: UIViewController {
             }
         }
         
-        print(colorsAssigned)
+//        print(colorsAssigned)
         
 
         
         
-        var adjListCopy = adjList
-        var removedNodes:[Int] = []
-        var i = 0
+//        var adjListCopy = adjList
+//        var removedNodes:[Int] = []
+//        var i = 0
         
         
 //        // VERY SLOW VERSION!
@@ -371,7 +426,7 @@ class DisplayViewController: UIViewController {
 //            i += 1
 //        }
         
-        print(removedNodes)
+//        print(removedNodes)
         
         //sort adjacency list
         
@@ -383,17 +438,20 @@ class DisplayViewController: UIViewController {
         
         var newNodes:[Node] = []
         for k in adjList {
-//            k[0].color = UIColor(colorLiteralRed: getRandomFloat(), green: getRandomFloat(), blue: getRandomFloat(), alpha: 1.0)
-//            print(adjList[k]?[0].color)
             newNodes.append((k[0]))
         }
         drawView.nodes = newNodes
-        drawView.setNeedsDisplay()
         
+        return colorsAssigned
     }
 
     @IBAction func pressedColorGraphButton(_ sender: Any) {
-        colorGraph(adjList: self.graphAdjList)
+        let startTime = Date()
+        CURRENT_COLORS_ASSIGNED = colorGraph(adjList: sortBySmallestLastDegree(adjList: self.graphAdjList ) )
+        let endTime = Date()
+        
+        TIME_TO_COLOR_GRAPH = endTime.timeIntervalSince(startTime)
+        drawView.setNeedsDisplay()
     }
     @IBAction func showValueChanged(_ sender: Any) {
         self.shouldShowNodes = self.showNodesSwitch.isOn
@@ -430,12 +488,17 @@ class DisplayViewController: UIViewController {
             
             var statistics:[(String,String)] = []
             
-            statistics.append(("Node Count",String(CURRENT_NODES.count)))
-            statistics.append(("Edge Count",String(CURRENT_EDGES.count)))
+            statistics.append(("Node Count (N)",String(CURRENT_NODES.count)))
+            statistics.append(("Edge Count (E)",String(CURRENT_EDGES.count)))
             statistics.append(("Connection Distance (R)",String(round(1000*CURRENT_CONNECTION_DISTANCE)/1000)))
-            statistics.append(("Average Degree",String(round(1000*2.0*Double(CURRENT_EDGES.count)/Double(CURRENT_NODES.count))/1000)))
+//            statistics.append(("Average Degree",String(round(1000*2.0*Double(CURRENT_EDGES.count)/Double(CURRENT_NODES.count))/1000)))
+            
+            for val in colorStats {
+                statistics.append(val)
+            }
             
             statistics.append(("Generate Graph (Time)",String(round(1000*TIME_TO_CREATE_GRAPH)/1000)))
+            statistics.append(("Color Graph (Time)",String(round(1000*TIME_TO_COLOR_GRAPH)/1000)))
             
             vc.statistics = statistics
 
