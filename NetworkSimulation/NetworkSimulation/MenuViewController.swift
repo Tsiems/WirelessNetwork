@@ -101,6 +101,7 @@ class MenuViewController: UIViewController {
     @IBOutlet weak var adjacencyLabel: UITextField!
     @IBOutlet weak var adjacencyTypeControl: UISegmentedControl!
     
+    @IBOutlet weak var displayNetworkSwitch: UISwitch!
     @IBOutlet weak var adjacencyTypeLabel: UILabel!
     @IBAction func newValuesSwitchChanged(_ sender: UISwitch) {
         
@@ -180,11 +181,10 @@ class MenuViewController: UIViewController {
                 vc.connectionDistance = vc.connectionDistance/2
             }
             
-            
-            print(vc.averageDegree)
             vc.shouldGenerateNewValues = self.newValuesSwitch.isOn
             
-            
+            vc.shouldShowEdges = self.displayNetworkSwitch.isOn
+            vc.shouldShowNodes = self.displayNetworkSwitch.isOn
 //            CURRENT_MODEL_INDEX = self.networkModelControl.selectedSegmentIndex
         }
     }

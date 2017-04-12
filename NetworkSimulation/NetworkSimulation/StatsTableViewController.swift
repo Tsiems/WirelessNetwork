@@ -11,6 +11,7 @@ import UIKit
 class StatsTableViewController: UITableViewController {
     
     var statistics:[(String,String)] = []
+    var bipartiteStats:[(String,String)] = []
     
     var graphs:[String] = ["Degree Distribution","Color Frequency","Degree When Deleted"]
     
@@ -21,6 +22,16 @@ class StatsTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        for stat in statistics {
+            print(stat.1,terminator:",")
+        }
+        print("\nBipartite stats: ")
+//        print(bipartiteStats)
+        for stat in bipartiteStats {
+            print(stat.1,terminator:",")
+        }
+        print("\nDone")
     }
 
     override func didReceiveMemoryWarning() {
@@ -32,7 +43,7 @@ class StatsTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 2
+        return 3
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -42,10 +53,24 @@ class StatsTableViewController: UITableViewController {
             return statistics.count
         case 1:
             return graphs.count
+        case 2:
+            return bipartiteStats.count
         default:
             return statistics.count
         }
-            
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch section {
+        case 0:
+            return "Basic Stats"
+        case 1:
+            return "Charts"
+        case 2:
+            return "Bipartite Stats"
+        default:
+            return "Other Stats"
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -63,6 +88,14 @@ class StatsTableViewController: UITableViewController {
             
             cell.typeLabel.text = graphs[indexPath.row]
 //            cell.valueLabel.text = statistics[indexPath.row].1
+            
+            return cell
+        }
+        else if indexPath.section == 2 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "statsCell", for: indexPath) as! StatsTableViewCell
+            
+            cell.typeLabel.text = bipartiteStats[indexPath.row].0
+            cell.valueLabel.text = bipartiteStats[indexPath.row].1
             
             return cell
         }

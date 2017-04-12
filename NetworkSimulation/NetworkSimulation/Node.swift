@@ -11,11 +11,12 @@ import UIKit
 class Node: NSObject {
     var x: Double = 0.0
     var y: Double = 0.0
-    var color: UIColor = UIColor.blue
+//    var color: UIColor = UIColor.blue
+    var color:Int = 0
     var id: Int = -1
     var countOfConnectedNodes = 0
     
-    init(x:Double,y:Double,id:Int,color:UIColor = UIColor.blue) {
+    init(x:Double,y:Double,id:Int,color:Int) {
         self.x = x
         self.y = y
         self.id = id

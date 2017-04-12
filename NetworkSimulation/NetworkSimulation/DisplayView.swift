@@ -8,6 +8,14 @@
 
 import UIKit
 
+var COLOR_VALUES:[UIColor] = [UIColor(colorLiteralRed: getRandomFloat(), green: getRandomFloat(), blue: getRandomFloat(), alpha: 1.0)]
+
+func generateColorValues() {
+    COLOR_VALUES = []
+    for _ in 0 ..< COLORS.count {
+        COLOR_VALUES.append(UIColor(colorLiteralRed: getRandomFloat(), green: getRandomFloat(), blue: getRandomFloat(), alpha: 1.0))
+    }
+}
 
 class DisplayView: UIView {
     
@@ -27,34 +35,26 @@ class DisplayView: UIView {
     
     var model = "Square"
     
-    var xCenter:Double = 150
-    var yCenter:Double = 200
-    var radius:Double = 100
-    
+//    var xCenter:Double = 150
+//    var yCenter:Double = 200
+//    var radius:Double = 100
     
     
     
     override func draw(_ rect: CGRect)
     {
+        
         xMax = Double(rect.size.width)
         yMax = Double(rect.size.height)
         
-        radius = Double(rect.size.height/2)
-        xCenter = Double(rect.size.width/2)
-        yCenter = Double(rect.size.height/2)
+//        radius = Double(rect.size.height/2)
+//        xCenter = Double(rect.size.width/2)
+//        yCenter = Double(rect.size.height/2)
         
         //draw nodes
         if shouldShowNodes {
-            
-            if model == "Square" {
+            if model == "Square" || model == "Disk"{
                 for node in nodes {
-                    drawNodeInSquare(obj: node)
-                }
-            }
-            else if model == "Disk" {
-//                var center = {x:y
-                for node in nodes {
-//                    drawNodeInDisk(obj: node)
                     drawNodeInSquare(obj: node)
                 }
             }
@@ -62,14 +62,8 @@ class DisplayView: UIView {
         
         //draw edges
         if shouldShowEdges {
-            if model == "Square" {
+            if model == "Square" || model == "Disk" {
                 for edge in edges {
-                    drawEdgeInSquare(obj: edge)
-                }
-            }
-            if model == "Disk" {
-                for edge in edges {
-//                    drawEdgeInDisk(obj: edge)
                     drawEdgeInSquare(obj: edge)
                 }
             }
@@ -78,8 +72,8 @@ class DisplayView: UIView {
     
     func drawNodeInSquare(obj:Node) {
         let ctx = UIGraphicsGetCurrentContext()
-        ctx?.setFillColor(obj.color.cgColor)
-        ctx?.setStrokeColor(obj.color.cgColor)
+        ctx?.setFillColor(COLOR_VALUES[obj.color].cgColor)
+        ctx?.setStrokeColor(COLOR_VALUES[obj.color].cgColor)
         ctx?.setLineWidth(CGFloat(NODE_SIZE))
         
         let rectangle = CGRect(x: xMax*obj.x-NODE_SIZE/2, y: yMax*obj.y-NODE_SIZE/2, width: NODE_SIZE, height: NODE_SIZE)
@@ -87,16 +81,6 @@ class DisplayView: UIView {
         ctx?.drawPath(using: .fillStroke)
     }
     
-    func drawNodeInDisk(obj:Node) {
-        let ctx = UIGraphicsGetCurrentContext()
-        ctx?.setFillColor(obj.color.cgColor)
-        ctx?.setStrokeColor(obj.color.cgColor)
-        ctx?.setLineWidth(CGFloat(NODE_SIZE))
-        
-        let rectangle = CGRect(x: xCenter+radius*obj.x-NODE_SIZE/2, y: yCenter+radius*obj.y-NODE_SIZE/2, width: NODE_SIZE, height: NODE_SIZE)
-        ctx?.addEllipse(in: rectangle)
-        ctx?.drawPath(using: .fillStroke)
-    }
     
     
     func drawEdgeInSquare(obj:Edge) {
@@ -107,12 +91,24 @@ class DisplayView: UIView {
         context?.addLine(to: CGPoint(x: xMax*obj.node2.x, y: yMax*obj.node2.y))
         context?.strokePath()
     }
-    func drawEdgeInDisk(obj:Edge) {
-        let context = UIGraphicsGetCurrentContext()
-        context?.setLineWidth(CGFloat(EDGE_WIDTH))
-        context?.setStrokeColor(obj.color.cgColor)
-        context?.move(to: CGPoint(x: xCenter+radius*obj.node1.x, y: yCenter+radius*obj.node1.y))
-        context?.addLine(to: CGPoint(x: xCenter+radius*obj.node2.x, y: yCenter+radius*obj.node2.y))
-        context?.strokePath()
-    }
+    
+    //    func drawNodeInDisk(obj:Node) {
+    //        let ctx = UIGraphicsGetCurrentContext()
+    //        ctx?.setFillColor(COLOR_VALUES[obj.color].cgColor)
+    //        ctx?.setStrokeColor(COLOR_VALUES[obj.color].cgColor)
+    //        ctx?.setLineWidth(CGFloat(NODE_SIZE))
+    //
+    //        let rectangle = CGRect(x: xCenter+radius*obj.x-NODE_SIZE/2, y: yCenter+radius*obj.y-NODE_SIZE/2, width: NODE_SIZE, height: NODE_SIZE)
+    //        ctx?.addEllipse(in: rectangle)
+    //        ctx?.drawPath(using: .fillStroke)
+    //    }
+
+//    func drawEdgeInDisk(obj:Edge) {
+//        let context = UIGraphicsGetCurrentContext()
+//        context?.setLineWidth(CGFloat(EDGE_WIDTH))
+//        context?.setStrokeColor(obj.color.cgColor)
+//        context?.move(to: CGPoint(x: xCenter+radius*obj.node1.x, y: yCenter+radius*obj.node1.y))
+//        context?.addLine(to: CGPoint(x: xCenter+radius*obj.node2.x, y: yCenter+radius*obj.node2.y))
+//        context?.strokePath()
+//    }
 }
