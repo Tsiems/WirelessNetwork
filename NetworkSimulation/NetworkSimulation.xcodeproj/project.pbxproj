@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		161A84711EA02672002FF6FE /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 161A84701EA02672002FF6FE /* SceneKit.framework */; };
+		161A84731EA026A9002FF6FE /* SphereScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161A84721EA026A9002FF6FE /* SphereScene.swift */; };
 		162E0FF31E60DE40002A1A13 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E0FF21E60DE40002A1A13 /* AppDelegate.swift */; };
 		162E0FF81E60DE40002A1A13 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 162E0FF61E60DE40002A1A13 /* Main.storyboard */; };
 		162E0FFA1E60DE40002A1A13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 162E0FF91E60DE40002A1A13 /* Assets.xcassets */; };
@@ -78,6 +80,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		161A84701EA02672002FF6FE /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = System/Library/Frameworks/SceneKit.framework; sourceTree = SDKROOT; };
+		161A84721EA026A9002FF6FE /* SphereScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SphereScene.swift; sourceTree = "<group>"; };
 		162E0FEF1E60DE40002A1A13 /* NetworkSimulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkSimulation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		162E0FF21E60DE40002A1A13 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		162E0FF71E60DE40002A1A13 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -106,6 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				161A84711EA02672002FF6FE /* SceneKit.framework in Frameworks */,
 				16DD8CA31E91BD270053B103 /* Charts.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -127,6 +132,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		161A846F1EA02672002FF6FE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				161A84701EA02672002FF6FE /* SceneKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		162E0FE61E60DE40002A1A13 = {
 			isa = PBXGroup;
 			children = (
@@ -134,6 +147,7 @@
 				162E10061E60DE40002A1A13 /* NetworkSimulationTests */,
 				162E10111E60DE40002A1A13 /* NetworkSimulationUITests */,
 				162E0FF01E60DE40002A1A13 /* Products */,
+				161A846F1EA02672002FF6FE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -154,6 +168,7 @@
 				162E0FF21E60DE40002A1A13 /* AppDelegate.swift */,
 				162E10201E60DE93002A1A13 /* MenuViewController.swift */,
 				166D7FF51E666EA60067EF6A /* Node.swift */,
+				161A84721EA026A9002FF6FE /* SphereScene.swift */,
 				166D7FF91E6677370067EF6A /* Edge.swift */,
 				162E10221E60DEA1002A1A13 /* DisplayViewController.swift */,
 				166D7FF71E66701D0067EF6A /* DisplayView.swift */,
@@ -362,6 +377,7 @@
 				163C05041E91731300D7C62C /* StatsTableViewController.swift in Sources */,
 				166D7FFA1E6677370067EF6A /* Edge.swift in Sources */,
 				162E10231E60DEA1002A1A13 /* DisplayViewController.swift in Sources */,
+				161A84731EA026A9002FF6FE /* SphereScene.swift in Sources */,
 				163C05061E91764C00D7C62C /* StatsTableViewCell.swift in Sources */,
 				166D7FF81E66701D0067EF6A /* DisplayView.swift in Sources */,
 				16DD8C981E918E720053B103 /* GraphsViewController.swift in Sources */,

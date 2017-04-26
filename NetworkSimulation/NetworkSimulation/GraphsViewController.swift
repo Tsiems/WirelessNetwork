@@ -12,53 +12,60 @@ import UIKit
 
 class GraphsViewController: UIViewController {
 
+    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet var barChartView: BarChartView!
     
+    @IBOutlet weak var lineChartView: LineChartView!
     @IBOutlet weak var chartTitleLabel: UILabel!
     
     var chartTitle = ""
     var input_data:[Double] = []
+    var input_data2:[Double] = []
     var chartDataLabel = ""
+    var chartDataLabel2 = ""
     var chartDescription = ""
-//    var months:[String] = []
+    var chartType = "Bar"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.titleLabel.text = self.title
         
-        barChartView?.noDataText = "UH OH! No Data!"
-        barChartView.setNeedsDisplay()
+        print(chartType)
+        if chartType == "Bar" {
+            barChartView.isHidden = false
+            lineChartView.isHidden = true
+            
+            barChartView?.noDataText = "UH OH! No Data!"
+            barChartView.setNeedsDisplay()
+            
+            
+            setChart(values: input_data, label:chartDataLabel, description:chartDescription)
+            chartTitleLabel.text = chartTitle
+        } else if chartType == "Line" {
+            barChartView.isHidden = true
+            lineChartView.isHidden = false
+            
+            lineChartView?.noDataText = "UH OH! No Data!"
+            lineChartView.setNeedsDisplay()
+            
+            
+            setLineChart(values1: input_data, values2: input_data2, label1:chartDataLabel, label2:chartDataLabel2, description:chartDescription)
+            chartTitleLabel.text = chartTitle
+
+        }
         
-//        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-//        let unitsSold = [20.0, 4.0, 6.0, 3.0, 12.0, 16.0, 4.0, 18.0, 2.0, 4.0, 5.0, 4.0]
-        
-        setChart(dataPoints: input_data, values: input_data, label:chartDataLabel, description:chartDescription)
-        chartTitleLabel.text = chartTitle
-        
-        
-//        var entries:[ChartDataEntry] = []
-//
-//        var data = BarChartData.
-//        
-//        var dataSet = BarChartDataSet(values: entries, label: "THE TEST")
-//
-//        (self.view as! BarChartView). = BarChartData(dataSet)
-        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     
-    func setChart(dataPoints: [Double], values: [Double],label:String,description:String) {
+    func setChart(values: [Double],label:String,description:String) {
         var dataEntries: [BarChartDataEntry] = []
         
-//        let formato:BarChartFormatter = BarChartFormatter()
-//    let xaxis:XAxis = XAxis()
-        
-        for i in 0..<dataPoints.count {
-            let dataEntry = BarChartDataEntry(x: Double(i), y: Double(values[i]),data:dataPoints[i] as AnyObject)
-//            let dataEntry = BarChartDataEntry(x: Double(i),y:Double(i), data: values[i] as AnyObject)
+        for i in 0..<values.count {
+            let dataEntry = BarChartDataEntry(x: Double(i), y: Double(values[i]),data:values[i] as AnyObject)
             dataEntries.append(dataEntry)
         }
 
@@ -66,29 +73,37 @@ class GraphsViewController: UIViewController {
         barChartView.data = BarChartData(dataSet: chartDataSet as IChartDataSet)
         
         barChartView.chartDescription?.text = description
-        //barChartView.xAxis.valueFormatter valueFormatter
-//        barChartView
-//        barChartView.noDataText = "You need to provide data for the chart."
-//        var dataEntries: [BarChartDataEntry] = []
-//        
-//        for i in 0..<dataPoints.count {
-//            let dataEntry = BarChartDataEntry(x: Double(i),y:Double(i), data: values[i] as AnyObject)
-//            dataEntries.append(dataEntry)
-//        }
-//        
-//        let chartDataSet = BarChartDataSet(values: dataEntries, label: "Units Sold")
-//        let chartData = BarChartData(dataSets: IChartDataSet(chartDataSet) )
-//        barChartView.data = chartData
+    }
+    
+    func setLineChart(values1: [Double], values2: [Double],label1:String,label2:String,description:String) {
+        
+        var dataEntries1: [ChartDataEntry] = []
+        var dataEntries2: [ChartDataEntry] = []
+        
+        for i in 0..<values1.count {
+            let dataEntry = ChartDataEntry(x: Double(i), y: values1[i])
+            dataEntries1.append(dataEntry)
+        }
+        
+        for i in 0..<values2.count {
+            let dataEntry = ChartDataEntry(x: Double(i), y: values2[i])
+            dataEntries2.append(dataEntry)
+        }
+        
+        
+        let lineChartDataSet1 = LineChartDataSet(values: dataEntries1, label: label1)
+        lineChartDataSet1.drawCirclesEnabled = false
+        lineChartDataSet1.setColor(NSUIColor.red, alpha: 1.0)
+        let lineChartDataSet2 = LineChartDataSet(values: dataEntries2, label: label2)
+        lineChartDataSet2.drawCirclesEnabled = false
+        lineChartDataSet2.setColor(NSUIColor.blue, alpha: 1.0)
+        
+        let lineChartData = LineChartData(dataSets: [lineChartDataSet1,lineChartDataSet2])
+        lineChartView.data = lineChartData
+        
+        lineChartView.chartDescription?.text = description
     }
 
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

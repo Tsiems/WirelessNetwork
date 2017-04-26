@@ -24,9 +24,11 @@ class DisplayView: UIView {
     
     var nodes:[Node] = []
     var edges:[Edge] = []
+    var extremeDegreeEdges:[Edge] = []
     
     var shouldShowNodes = true
     var shouldShowEdges = true
+    var shouldShowExtremeEdges = true
     
     var xMin:Double = 50
     var yMin:Double = 100
@@ -35,10 +37,6 @@ class DisplayView: UIView {
     
     var model = "Square"
     
-//    var xCenter:Double = 150
-//    var yCenter:Double = 200
-//    var radius:Double = 100
-    
     
     
     override func draw(_ rect: CGRect)
@@ -46,10 +44,6 @@ class DisplayView: UIView {
         
         xMax = Double(rect.size.width)
         yMax = Double(rect.size.height)
-        
-//        radius = Double(rect.size.height/2)
-//        xCenter = Double(rect.size.width/2)
-//        yCenter = Double(rect.size.height/2)
         
         //draw nodes
         if shouldShowNodes {
@@ -65,6 +59,12 @@ class DisplayView: UIView {
             if model == "Square" || model == "Disk" {
                 for edge in edges {
                     drawEdgeInSquare(obj: edge)
+                }
+                
+                if shouldShowExtremeEdges {
+                    for edge in extremeDegreeEdges {
+                        drawEdgeInSquare(obj: edge)
+                    }
                 }
             }
         }
@@ -85,6 +85,7 @@ class DisplayView: UIView {
     
     func drawEdgeInSquare(obj:Edge) {
         let context = UIGraphicsGetCurrentContext()
+        context?.setLineWidth(CGFloat(EDGE_WIDTH*2))
         context?.setLineWidth(CGFloat(EDGE_WIDTH))
         context?.setStrokeColor(obj.color.cgColor)
         context?.move(to: CGPoint(x: xMax*obj.node1.x, y: yMax*obj.node1.y))

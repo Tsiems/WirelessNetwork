@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SceneKit
 
 var CURRENT_NODES:[Node] = []
 var CURRENT_EDGES:[Edge] = []
@@ -14,12 +15,14 @@ var CURRENT_CONNECTION_DISTANCE = 0.08
 var TIME_TO_CREATE_GRAPH = 0.0
 var TIME_TO_COLOR_GRAPH = 0.0
 var TIME_FOR_SMALLEST_LAST_ORDERING = 0.0
+var TIME_FOR_BIPARTITE = 0.0
 var CURRENT_ADJACENCY_LIST:[[Node]] = []
 var CURRENT_COLORS_ASSIGNED:[Int] = []
 var CURRENT_COLOR_FREQUENCIES:[Int:Int] = [:]
 var CURRENT_COLOR_FREQUENCIES_PAIRED:[(Int,Int)] = []
 var COLORS:[Int] = []
 var DEGREE_WHEN_DELETED:[Int] = []
+var ORIGINAL_DEGREE:[Int] = []
 
 //var CURRENT_MODEL_INDEX:INT = 0
 
@@ -33,11 +36,16 @@ func getRandomFloat() -> Float {
 
 class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerViewDataSource  {
 
+    @IBOutlet weak var titleLabel: UILabel!
     
     var networkModel = "Square"
     var nodeCount = 128 // will be changed by the slider
     var connectionDistance = 0.075
     var averageDegree = 6.0
+    
+    var sphereNodes:[Node] = []
+    var sphereEdges:[Edge] = []
+    var extremeDegreeEdges:[Edge] = []
     
     var shouldShowNodes = true
     var shouldShowEdges = true
@@ -50,6 +58,7 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
     
     var graphAdjList:[[Node]] = []
 
+    @IBOutlet weak var sceneKitView: SCNView!
     @IBOutlet weak var drawView: DisplayView!
     @IBOutlet weak var showNodesSwitch: UISwitch!
     @IBOutlet weak var showEdgesSwitch: UISwitch!
@@ -58,7 +67,7 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.titleLabel.text = self.title
         showNodesSwitch.isOn = shouldShowNodes
         showEdgesSwitch.isOn = shouldShowEdges
         
@@ -75,13 +84,42 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             if networkModel == "Disk" {
                 let nodes = generateRandomNodesInDisk(num: nodeCount)
                 CURRENT_NODES = nodes
+                
+                let edges:[Edge] = generateEdgesUsingCellMethod(nodes: CURRENT_NODES, r: connectionDistance)
+                CURRENT_EDGES = edges
+                
+                self.drawView.isHidden = false
+                self.sceneKitView.isHidden = true
+                
+            } else if networkModel == "Sphere" {
+                let nodes = generateRandomNodesInSphere(num: nodeCount)
+                CURRENT_NODES = nodes
+                
+//                let time1 = Date()
+//                var edges:[Edge] = generateEdgesBruteForce(nodes: CURRENT_NODES, r: connectionDistance)
+//                let time2 = Date()
+                let edges = generateEdgesUsingCellMethod3d(nodes: CURRENT_NODES, r: connectionDistance)
+//                let time3 = Date()
+//                print("Brute Force Time: ", time2.timeIntervalSince(time1))
+//                print("Cell Time: ", time3.timeIntervalSince(time2))
+                CURRENT_EDGES = edges
+                
+                sphereEdges = edges
+                sphereNodes = nodes
             }
             else {
                 let nodes = generateRandomNodesInSquare(num: nodeCount)
                 CURRENT_NODES = nodes
+                
+                let edges:[Edge] = generateEdgesUsingCellMethod(nodes: CURRENT_NODES, r: connectionDistance)
+                CURRENT_EDGES = edges
+                
+                
+                self.drawView.isHidden = false
+                self.sceneKitView.isHidden = true
             }
-            let edges:[Edge] = generateEdgesUsingCellMethod(nodes: CURRENT_NODES, r: connectionDistance)
-            CURRENT_EDGES = edges
+            
+            
         }
         
         let graphCreatedTime = Date()
@@ -91,15 +129,43 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         self.graphAdjList = getAdjacencyList(nodes: CURRENT_NODES, edges: CURRENT_EDGES)
         CURRENT_ADJACENCY_LIST = self.graphAdjList
         
-        drawView.nodes = CURRENT_NODES
-        drawView.edges = CURRENT_EDGES
-        drawView.NODE_SIZE = self.node_size
-        drawView.EDGE_WIDTH = self.edge_width
-        drawView.shouldShowNodes = self.shouldShowNodes
-        drawView.shouldShowEdges = self.shouldShowEdges
         
         
-        drawView.model = networkModel
+        let minMaxDegreeIds = findMinAndMaxDegreeNodes()
+        
+        extremeDegreeEdges = []
+        for e in CURRENT_EDGES {
+            if e.node1.id == minMaxDegreeIds.0 || e.node2.id == minMaxDegreeIds.0 {
+                let edge = e
+                edge.color = UIColor.blue
+                extremeDegreeEdges.append(edge)
+            }
+            else if e.node1.id == minMaxDegreeIds.1 || e.node2.id == minMaxDegreeIds.1 {
+                let edge = e
+                edge.color = UIColor.green
+                extremeDegreeEdges.append(edge)
+            }
+        }
+        
+        
+        
+        if networkModel == "Sphere" {
+            displaySphereNetwork()
+            
+        } else {
+            drawView.nodes = CURRENT_NODES
+            drawView.edges = CURRENT_EDGES
+            drawView.NODE_SIZE = self.node_size
+            drawView.EDGE_WIDTH = self.edge_width
+            drawView.shouldShowNodes = self.shouldShowNodes
+            drawView.shouldShowEdges = self.shouldShowEdges
+            drawView.extremeDegreeEdges = extremeDegreeEdges
+            drawView.model = networkModel
+        }
+        
+        
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -112,37 +178,56 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         self.performSegue(withIdentifier: "unwindToMenu", sender: self)
     }
     
-    func generateUniformNodes(num:Int,xMin:Double,yMin:Double,xMax:Double,yMax:Double) -> [Node]{
-        var current_id = 0
-        var nodes:[Node] = []
-        let divider:Double = sqrt(Double(num))
-        for i in 0 ..< num {
-            
-            let x = xMin + Double( Int( Double(i) * xMax / divider) % Int( xMax ) )
-            let y = yMin + yMax / divider * Double( Int( Double(i) * yMax / divider) / Int( yMax ) )
-            let id = current_id
-            
-            current_id += 1
-            nodes.append( Node(x:x,y:y,id:id, color: 0 ) )
-        }
-        
-        return nodes
+    func resetSphereNetwork() {
+        self.sceneKitView.scene = SphereScene()
     }
     
-    func generateRandomNodesOnRect(num:Int,xMin:Double,yMin:Double,xMax:Double,yMax:Double) -> [Node]{
-        var nodes:[Node] = []
-        var current_id = 0
-        for _ in 0 ..< num {
-            
-            let x = xMin + (xMax-xMin) * getRandomDouble()
-            let y = yMin + (yMax-yMin) * getRandomDouble()
-            
-            nodes.append( Node(x:x,y:y, id: current_id, color: 0 ) )
-            current_id += 1
-        }
+    func displaySphereNetwork() {
+        self.drawView.isHidden = true
+        self.sceneKitView.isHidden = false
         
-        return nodes
+        
+//        self.sceneKitView
+        self.sceneKitView.scene = SphereScene(nodes:sphereNodes,edges:sphereEdges,extremeEdges:extremeDegreeEdges,shouldShowNodes:shouldShowNodes,shouldShowEdges:shouldShowEdges,shouldShowExtremeEdges: !self.showBipartiteSwitch.isOn )
+        
+        self.sceneKitView.backgroundColor = UIColor.black
+//        self.sceneKitView.autoenablesDefaultLighting = true
+        self.sceneKitView.allowsCameraControl = CURRENT_NODES.count < 7000
+//        self.sceneKitView.showsStatistics = true
+//        print("framerate:",self.sceneKitView.preferredFramesPerSecond)
     }
+    
+//    func generateUniformNodes(num:Int,xMin:Double,yMin:Double,xMax:Double,yMax:Double) -> [Node]{
+//        var current_id = 0
+//        var nodes:[Node] = []
+//        let divider:Double = sqrt(Double(num))
+//        for i in 0 ..< num {
+//            
+//            let x = xMin + Double( Int( Double(i) * xMax / divider) % Int( xMax ) )
+//            let y = yMin + yMax / divider * Double( Int( Double(i) * yMax / divider) / Int( yMax ) )
+//            let id = current_id
+//            
+//            current_id += 1
+//            nodes.append( Node(x:x,y:y,id:id, color: 0 ) )
+//        }
+//        
+//        return nodes
+//    }
+    
+//    func generateRandomNodesOnRect(num:Int,xMin:Double,yMin:Double,xMax:Double,yMax:Double) -> [Node]{
+//        var nodes:[Node] = []
+//        var current_id = 0
+//        for _ in 0 ..< num {
+//            
+//            let x = xMin + (xMax-xMin) * getRandomDouble()
+//            let y = yMin + (yMax-yMin) * getRandomDouble()
+//            
+//            nodes.append( Node(x:x,y:y, id: current_id, color: 0 ) )
+//            current_id += 1
+//        }
+//        
+//        return nodes
+//    }
     
     func generateRandomNodesInSquare(num:Int) -> [Node]{
         var nodes:[Node] = []
@@ -172,6 +257,21 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         return nodes
     }
     
+    func generateRandomNodesInSphere(num:Int) -> [Node]{
+        var nodes:[Node] = []
+        var current_id = 0
+        for _ in 0 ..< num {
+            let u = getRandomDouble()*2.0 - 1.0
+            let degree = getRandomDouble()*360
+            let x = sqrt(1 - u*u)*cos(degree)
+            let y = sqrt(1 - u*u)*sin(degree)
+            let z = u
+            nodes.append( Node(x:x,y:y,z:z, id: current_id, color: 0 ) )
+            current_id += 1
+        }
+        return nodes
+    }
+    
     
     func generateEdgesBruteForce(nodes:[Node], r:Double) -> [Edge] {
         // WARNING: this is very slow and is O(n^2)
@@ -179,12 +279,12 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         
         for i in 0 ..< nodes.count-1 {
             for j in i+1 ..< nodes.count {
-                if sqrt( pow(nodes[i].x-nodes[j].x,2) + pow(nodes[i].y-nodes[j].y,2)) <= r {
+                if sqrt( pow(nodes[i].x-nodes[j].x,2) + pow(nodes[i].y-nodes[j].y,2) + pow(nodes[i].z-nodes[j].z,2)) <= r {
                     edges.append( Edge(node1: nodes[i],node2: nodes[j]))
                 }
             }
         }
-        print(edges.count)
+        print("Brute Force Edges: ",edges.count)
         
         return edges
     }
@@ -258,14 +358,132 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         
         print(edges.count)
         
+        return edges
+    }
+    
+    func generateEdgesUsingCellMethod3d(nodes:[Node], r:Double) -> [Edge] {
+        var edges:[Edge] = []
         
-//        for i in 0 ..< nodes.count-1 {
-//            for j in i+1 ..< nodes.count {
-//                if sqrt( pow(nodes[i].x-nodes[j].x,2) + pow(nodes[i].y-nodes[j].y,2)) <= r {
-//                    edges.append( Edge(node1: nodes[i],node2: nodes[j]))
-//                }
-//            }
-//        }
+        let rowCount = Int(ceil(2.0/r))
+        
+        var cells:[[[[Node]]]] = [[[[Node]]]](repeating: [[[Node]]](repeating: [[Node]](repeating: [], count: rowCount ), count: rowCount ), count: rowCount)
+        
+        for node in nodes {
+            let i = Int((node.x+1.0)/r)
+            let j = Int((node.y+1.0)/r)
+            let k = Int((node.z+1.0)/r)
+            cells[ i ][ j ][ k ].append(node)
+        }
+        
+        let time2 = Date()
+        
+        //for each cell
+        var i = 0
+        while (i < rowCount) {
+            var j = 0
+            while (j < rowCount) {
+                var k = 0
+                while (k < rowCount) {
+                    if cells[i][j][k].count > 0 {
+                        var testNodes:[Node] = []
+                        
+                        //find adjacent cells
+                        if i+1 < rowCount && j+1 < rowCount && k+1 < rowCount {
+                            let one = cells[i][j][k+1]
+                            let two = cells[i][j+1][k]
+                            let three = cells[i][j+1][k+1]
+                            let four = cells[i+1][j][k]
+                            let five = cells[i+1][j][k+1]
+                            let six = cells[i+1][j+1][k]
+                            let seven = cells[i+1][j+1][k+1]
+                            
+                            testNodes.append(contentsOf: ((one+two)+(three+four))+((five+six)+seven))
+                            
+                            if j > 0 {
+                                let eight = cells[i+1][j-1][k]
+                                let nine = cells[i+1][j-1][k+1]
+                                testNodes.append(contentsOf: eight+nine)
+                            }
+                        } else if i+1 < rowCount && j+1 < rowCount {
+                            let two = cells[i][j+1][k]
+                            let four = cells[i+1][j][k]
+                            let six = cells[i+1][j+1][k]
+                            
+                            testNodes.append(contentsOf: (two+four)+six )
+                            
+                            if j > 0 {
+                                let eight = cells[i+1][j-1][k]
+                                testNodes.append(contentsOf: eight)
+                            }
+                            
+                        } else if i+1 < rowCount && k+1 < rowCount {
+                            let one = cells[i][j][k+1]
+                            let four = cells[i+1][j][k]
+                            let five = cells[i+1][j][k+1]
+                            
+                            testNodes.append(contentsOf: (one+four)+five )
+                            
+                            if j > 0 {
+                                let eight = cells[i+1][j-1][k]
+                                let nine = cells[i+1][j-1][k+1]
+                                testNodes.append(contentsOf: eight+nine)
+                            }
+                        } else if i+1 < rowCount {
+                            testNodes.append(contentsOf: cells[i+1][j][k])
+                            
+                            if j > 0 {
+                                testNodes.append(contentsOf:cells[i+1][j-1][k])
+                            }
+                        } else if j+1 < rowCount && k+1 < rowCount {
+                            let one = cells[i][j][k+1]
+                            let two = cells[i][j+1][k]
+                            let three = cells[i][j+1][k+1]
+                            
+                            testNodes.append(contentsOf: (one+two)+three )
+                            
+                        } else if j+1 < rowCount {
+                            testNodes.append(contentsOf: cells[i][j+1][k])
+                        } else if k+1 < rowCount {
+                            testNodes.append(contentsOf: cells[i][j][k+1])
+                        }
+                        
+                        
+                        // test nodes in adjacent cells
+                        for node in cells[i][j][k] {
+                            var l = 0
+                            while (l < testNodes.count) {
+                                if sqrt( pow(node.x-testNodes[l].x,2) + pow(node.y-testNodes[l].y,2) + pow(node.z-testNodes[l].z,2)) <= r {
+                                    edges.append( Edge(node1: node,node2: testNodes[l]))
+                                }
+                                l += 1
+                            }
+                        }
+                        
+                        // test nodes within
+                        var m = 0
+                        while m < cells[i][j][k].count-1 {
+                            var l = m+1
+                            while l < cells[i][j][k].count {
+                                if sqrt( pow(cells[i][j][k][m].x-cells[i][j][k][l].x,2) + pow(cells[i][j][k][m].y-cells[i][j][k][l].y,2) + pow(cells[i][j][k][m].z-cells[i][j][k][l].z,2)) <= r {
+                                    edges.append( Edge(node1: cells[i][j][k][m],node2: cells[i][j][k][l]))
+                                }
+                                l += 1
+                            }
+                            m += 1
+                        }
+                    }
+                    k+=1
+                }
+                j += 1
+            }
+            i += 1
+        }
+        
+        let time3 = Date()
+        
+        print("Time new: ",time3.timeIntervalSince(time2))
+        
+        print(edges.count)
         
         return edges
     }
@@ -333,6 +551,7 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
     func sortBySmallestLastDegreeFaster(adjList: [[Node]]) -> [[Node]] {
         colorStats = []
         DEGREE_WHEN_DELETED = []
+        ORIGINAL_DEGREE = []
         
         let startTimeFaster = Date()
         
@@ -375,6 +594,7 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             let nodeList = referenceList[minVal!.0].0
             newList.append(nodeList)
             DEGREE_WHEN_DELETED.append(minVal!.1 - 1)
+            ORIGINAL_DEGREE.append(nodeList.count - 1)
             referenceList[minVal!.0].1 = -1
 //            print("Removing node: ",minVal)
             let before = Date()
@@ -426,6 +646,7 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
     func sortBySmallestLastDegreeFast(adjList: [[Node]]) -> [[Node]] {
         colorStats = []
         DEGREE_WHEN_DELETED = []
+        ORIGINAL_DEGREE = []
         
         let startTimeFaster = Date()
         
@@ -481,11 +702,16 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             
             newList.append(adjList[minVal])
             DEGREE_WHEN_DELETED.append(referenceList[minVal].1)
+            
+//            print(referenceList[minVal].0.count - 1,referenceList[minVal].1)
             referenceList[minVal].1 = -1
             //            print("Removing node: ",minVal)
 //            let before = Date()
             
             let nodeList = referenceList[minVal].0
+            ORIGINAL_DEGREE.append(nodeList.count - 1)
+            
+            
             for id in nodeList {
                 if referenceList[id].1 >= 0 {
                     subtractBucket(value: id, buckets: &buckets, referenceList: &referenceList)
@@ -498,13 +724,15 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             //            print("UPDATE TIME: ", before.timeIntervalSinceNow)
         }
         
-        colorStats.append( ("Min Degree w/ fast",String(DEGREE_WHEN_DELETED[0])) )
-        colorStats.append( ("Avg Degree w/ fast",String( round( Double( totalDegree ) / Double( newList.count ) * 1000 ) / 1000 ) ) )
-        colorStats.append( ("Max Degree w/ fast",String(maxDegree)) )
-        colorStats.append( ( "Max Degree when Deleted w/ fast",String( DEGREE_WHEN_DELETED.max()!  ) ) )
+        colorStats.append( ("Min Degree",String(DEGREE_WHEN_DELETED[0])) )
+        colorStats.append( ("Avg Degree",String( round( Double( totalDegree ) / Double( newList.count ) * 1000 ) / 1000 ) ) )
+        colorStats.append( ("Max Degree",String(maxDegree)) )
+        colorStats.append( ( "Max Degree when Deleted",String( DEGREE_WHEN_DELETED.max()!  ) ) )
         
         print("STATS",colorStats)
         newList.reverse()
+        ORIGINAL_DEGREE.reverse()
+        DEGREE_WHEN_DELETED.reverse()
         
         
         print("SETUP TIME: ",midTimeFaster.timeIntervalSince(startTimeFaster))
@@ -567,10 +795,10 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         colorStats.append( ("Max Degree",String(maxDegree)) )
         colorStats.append( ( "Max Degree when Deleted",String( DEGREE_WHEN_DELETED.max()!  ) ) )
         
-        print("STATS",colorStats)
-        
-        print("SETUP TIME NORMAL: ",midTime.timeIntervalSince(startTime))
-        print("REST OF TIME: ",endTime.timeIntervalSince(midTime))
+//        print("STATS",colorStats)
+//        
+//        print("SETUP TIME NORMAL: ",midTime.timeIntervalSince(startTime))
+//        print("REST OF TIME: ",endTime.timeIntervalSince(midTime))
         
         return newList
     }
@@ -682,6 +910,8 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
 
     @IBAction func pressedColorGraphButton(_ sender: Any) {
         
+        resetSphereNetwork()
+        
         let startTimeFaster = Date()
         let sorted = sortBySmallestLastDegreeFast(adjList: self.graphAdjList )
         let midTimeFaster = Date()
@@ -705,31 +935,45 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
 //        print("Max Edges: ",getMaxBipartiteGraphElements())
 //        let startTime1 = Date()
         
-        
+        let beforeBipartite = Date()
         let maxEdges = getMaxBipartiteEdges()
         colorStats.append(("Max Edges in a Bipartite Subgraph",String(maxEdges)))
-//        print("Max Edges faster: ", maxEdges)
+//        print("Max Edges faster: ", maxEdges)round(10000*Float(maxMajorComponent.1)/Float(CURRENT_NODES.count))/100))
         bipartiteStats = []
         let maxMajorComponent = getMaxBipartiteGraphElements()
+        
+        let afterBipartite = Date()
+        
         bipartiteStats.append(("Max Backbone Vertices",String(maxMajorComponent.1)))
         bipartiteStats.append(("Max Backbone Edges",String(maxMajorComponent.0)))
-        bipartiteStats.append(("Max Backbone Domination Percentage",String(round(10000*Float(maxMajorComponent.1)/Float(CURRENT_NODES.count))/100)))
+        bipartiteStats.append(("Max Backbone Domination Percentage",String(round(maxMajorComponent.2*10000)/100)))
+        
+        if networkModel == "Sphere" {
+            bipartiteStats.append(("Max Backbone Faces",String(maxMajorComponent.0-maxMajorComponent.1+2)))
+        }
 //        bipartiteStats.append(("Max Backbone Colors",String(maxMajorComponent.2.0)+" and "+String(maxMajorComponent.2.1)))
         
-        bipartiteStats.append(("2nd Max Backbone Vertices",String(maxMajorComponent.4)))
-        bipartiteStats.append(("2nd Max Backbone Edges",String(maxMajorComponent.3)))
-        bipartiteStats.append(("2nd Max Backbone Domination Percentage",String(round(10000*Float(maxMajorComponent.4)/Float(CURRENT_NODES.count))/100)))
+        bipartiteStats.append(("2nd Max Backbone Vertices",String(maxMajorComponent.5)))
+        bipartiteStats.append(("2nd Max Backbone Edges",String(maxMajorComponent.4)))
+        bipartiteStats.append(("2nd Max Backbone Domination Percentage",String(round(maxMajorComponent.6*10000)/100)))
+        
+        if networkModel == "Sphere" {
+            bipartiteStats.append(("2nd Max Backbone Faces",String(maxMajorComponent.4-maxMajorComponent.5+2)))
+        }
 //        bipartiteStats.append(("2nd Max Backbone Colors",String(maxMajorComponent.5.0)+" and "+String(maxMajorComponent.5.1)))
         
         
-        
+        TIME_FOR_BIPARTITE = afterBipartite.timeIntervalSince(beforeBipartite)
 
 //        let startTime2 = Date()
 //        print("Times: ", startTime1.timeIntervalSince(endTime), " | ",startTime2.timeIntervalSince(startTime1))
         generateColorValues()
         
-        
-        drawView.setNeedsDisplay()
+        if networkModel == "Sphere" {
+            displaySphereNetwork()
+        } else {
+            drawView.setNeedsDisplay()
+        }
     }
     @IBAction func showValueChanged(_ sender: Any) {
         self.shouldShowNodes = self.showNodesSwitch.isOn
@@ -737,7 +981,11 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         drawView.shouldShowNodes = self.shouldShowNodes
         drawView.shouldShowEdges = self.shouldShowEdges
         
-        drawView.setNeedsDisplay()
+        if networkModel == "Sphere" {
+            displaySphereNetwork()
+        } else {
+            drawView.setNeedsDisplay()
+        }
     }
     
     @IBAction func unwindToDisplay(segue: UIStoryboardSegue) {
@@ -771,10 +1019,12 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             statistics.append(("Generate Graph (Time)",String(round(1000*TIME_TO_CREATE_GRAPH)/1000)))
             statistics.append(("Smallest Last Ordering (Time)",String(round(1000*TIME_FOR_SMALLEST_LAST_ORDERING)/1000)))
             statistics.append(("Color Graph (Time)",String(round(1000*TIME_TO_COLOR_GRAPH)/1000)))
+            statistics.append(("Bipartite Stats (Time)",String(round(1000*TIME_FOR_BIPARTITE)/1000)))
             
             vc.bipartiteStats = self.bipartiteStats
             vc.statistics = statistics
-
+            
+            vc.title = self.title! + "  Stats"
             
             //            CURRENT_MODEL_INDEX = self.networkModelControl.selectedSegmentIndex
         }
@@ -849,33 +1099,64 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
     
     func displayBipartiteGraph() {
         if self.showBipartiteSwitch.isOn && color1 != color2 && color1 != -1 && color2 != -1 {
-            print("Works!")
-            
+            resetSphereNetwork()
             
             let bipartiteGraph = getNodesAndEdgesFromBipartiteGraph(with: color1, secondColor: color2)
             
-            print( getComponents(edges: bipartiteGraph.1) )
             
-            self.drawView.nodes = bipartiteGraph.0
-            self.drawView.edges = bipartiteGraph.1
-            self.drawView.setNeedsDisplay()
+            if networkModel == "Sphere" {
+                sphereNodes = bipartiteGraph.0
+                sphereEdges = bipartiteGraph.1
+                displaySphereNetwork()
+            } else {
+                self.drawView.nodes = bipartiteGraph.0
+                self.drawView.edges = bipartiteGraph.1
+                self.drawView.shouldShowExtremeEdges = false
+                drawView.setNeedsDisplay()
+                
+            }
         } else {
-            self.drawView.nodes = CURRENT_NODES
-            self.drawView.edges = CURRENT_EDGES
-            self.drawView.setNeedsDisplay()
+            
+            if networkModel == "Sphere" {
+                sphereNodes = CURRENT_NODES
+                sphereEdges = CURRENT_EDGES
+                displaySphereNetwork()
+            } else {
+                self.drawView.nodes = CURRENT_NODES
+                self.drawView.edges = CURRENT_EDGES
+                self.drawView.shouldShowExtremeEdges = true
+                drawView.setNeedsDisplay()
+            }
         }
     }
     
-    func getMaxBipartiteGraphElements() -> (Int,Int,(Int,Int),Int,Int,(Int,Int)) {
+    func getDominationPercentage(nodeIds:[Int]) -> Double {
+        //calculate the domination percentage of the backbones
+        var ids:Set<Int> = Set.init()
+        
+        //add all ids to the set
+        for id in nodeIds {
+            for connected in graphAdjList[id] {
+                ids.insert(connected.id)
+            }
+        }
+        
+        return Double(ids.count)/Double(CURRENT_NODES.count)
+    }
+    
+    func getMaxBipartiteGraphElements() -> (Int,Int,Double,(Int,Int),Int,Int,Double,(Int,Int)) {
         
         var maxIndex = (-1,-1)
         var maxMajorCompSize = -1
         var numberOfNodes = -1
+        var maxDominationPercentage:Double = 0.0
         
         var secondMaxIndex = (-1,-1)
         var secondMaxSize = -1
         var secondNumberOfNodes = -1
+        var secondDominationPercentage:Double = 0.0
         
+        //find the top bipartite graphs
         for i in 0..<min(COLORS.count-1,3) {
             for j in (i+1)..<min(COLORS.count,4) {
                 let elements = getNodesAndEdgesFromBipartiteGraph(with: CURRENT_COLOR_FREQUENCIES_PAIRED[i].0, secondColor: CURRENT_COLOR_FREQUENCIES_PAIRED[j].0)
@@ -884,20 +1165,26 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
                     secondMaxSize = maxMajorCompSize
                     secondMaxIndex = maxIndex
                     secondNumberOfNodes = numberOfNodes
+                    secondDominationPercentage = maxDominationPercentage
                     
                     maxMajorCompSize = parts[0].1
                     maxIndex = (i,j)
                     numberOfNodes = parts[0].0.count
+                    maxDominationPercentage = getDominationPercentage(nodeIds: parts[0].0)
                 } else if parts[0].1 > secondMaxSize {
                     secondMaxSize = parts[0].1
                     secondMaxIndex = (i,j)
                     secondNumberOfNodes = parts[0].0.count
+                    secondDominationPercentage = getDominationPercentage(nodeIds: parts[0].0)
                 }
             }
         }
         
         
-        return (maxMajorCompSize,numberOfNodes,maxIndex,secondMaxSize,secondNumberOfNodes,secondMaxIndex)
+        
+        
+        
+        return (maxMajorCompSize,numberOfNodes,maxDominationPercentage,maxIndex,secondMaxSize,secondNumberOfNodes,secondDominationPercentage,secondMaxIndex)
     }
     
     func getMaxBipartiteEdges() -> Int {
@@ -969,6 +1256,25 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         
         //sort by largest component first
         return components.sorted { ($0.1) > ($1.1) }
+    }
+    
+    func findMinAndMaxDegreeNodes() -> (Int,Int) {
+        var ids = (0,0)
+        var min = 100000
+        var max = 0
+        
+        for list in graphAdjList {
+            if list.count > max {
+                max = list.count
+                ids.1 = list[0].id
+            }
+            else if list.count < min {
+                min = list.count
+                ids.0 = list[0].id
+            }
+        }
+        
+        return ids
     }
     
     

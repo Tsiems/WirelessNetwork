@@ -23,8 +23,12 @@ class MenuViewController: UIViewController {
         //tap.cancelsTouchesInView = false
         
         view.addGestureRecognizer(tap)
-//        addDoneButtonOnKeyboard()
         
+        self.displayNetworkSwitch.isOn = false
+        self.adjacencyTypeControl.selectedSegmentIndex = 1
+        displayAdjacencyValue()
+        
+        self.title = "Wireless Sensor Network Generator"
     }
     
     //Calls this function when the tap is recognized.
@@ -43,6 +47,8 @@ class MenuViewController: UIViewController {
                 case "Square":
                     r = sqrt(amt/Float(nodeCount)/Float.pi)
                 case "Disk":
+                    r = sqrt(amt/Float(nodeCount))
+                case "Sphere":
                     r = sqrt(amt/Float(nodeCount))
                 default:
                     r = sqrt(amt/Float(nodeCount)/Float.pi)
@@ -69,6 +75,7 @@ class MenuViewController: UIViewController {
                 if self.nodeNumberSlider.value != amt {
                     self.newValuesSwitch.isOn = true
                     self.nodeNumberSlider.value = amt
+                    displayAdjacencyValue()
                 }
             }
             else {
@@ -128,6 +135,8 @@ class MenuViewController: UIViewController {
         self.nodeNumberLabel.text = String(Int(self.nodeNumberSlider.value))
         displayAdjacencyValue()
         self.newValuesSwitch.isOn = true
+        
+        self.displayNetworkSwitch.isOn = Int(self.nodeNumberSlider.value) <= 16000
     }
     
     func displayAdjacencyValue() {
@@ -142,6 +151,8 @@ class MenuViewController: UIViewController {
             case "Square":
                 avgDegree = Float(nodeCount)*Float.pi*value*value
             case "Disk":
+                avgDegree = Float(nodeCount)*value*value
+            case "Sphere":
                 avgDegree = Float(nodeCount)*value*value
             default:
                 avgDegree = Float(nodeCount)*Float.pi*value*value
@@ -179,12 +190,18 @@ class MenuViewController: UIViewController {
             } else if vc.networkModel == "Disk" {
                 vc.averageDegree = Double(vc.nodeCount)*vc.connectionDistance*vc.connectionDistance
                 vc.connectionDistance = vc.connectionDistance/2
+            } else if vc.networkModel == "Sphere" {
+                vc.averageDegree = Double(vc.nodeCount)*vc.connectionDistance*vc.connectionDistance/4
+                vc.connectionDistance = vc.connectionDistance*2
             }
             
             vc.shouldGenerateNewValues = self.newValuesSwitch.isOn
             
             vc.shouldShowEdges = self.displayNetworkSwitch.isOn
             vc.shouldShowNodes = self.displayNetworkSwitch.isOn
+            
+            vc.title = String(vc.nodeCount)+" vertices, "+String(vc.averageDegree)+" Avg. Degree"
+            vc.title = "|V| = "+String(vc.nodeCount)+" ,  Avg. Degree = "+self.adjacencyLabel.text!
 //            CURRENT_MODEL_INDEX = self.networkModelControl.selectedSegmentIndex
         }
     }
