@@ -30,7 +30,6 @@ class GraphsViewController: UIViewController {
         super.viewDidLoad()
         self.titleLabel.text = self.title
         
-        print(chartType)
         if chartType == "Bar" {
             barChartView.isHidden = false
             lineChartView.isHidden = true
