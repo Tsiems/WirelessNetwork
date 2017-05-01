@@ -5,10 +5,9 @@
 //  Created by Travis Siems on 4/2/17.
 //  Copyright © 2017 Travis Siems. All rights reserved.
 //
-import Charts
-//#import "BarChartViewController.h"
-import UIKit
 
+import Charts
+import UIKit
 
 class GraphsViewController: UIViewController {
 

@@ -27,7 +27,6 @@ var TERMINAL_CLIQUE_SIZE = 1
 
 let VERIFICATION_WALKTHROUGH = false
 
-//var CURRENT_MODEL_INDEX:INT = 0
 
 func getRandomDouble() -> Double {
     return Double(Float(arc4random()) / Float(UINT32_MAX))
@@ -467,22 +466,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         
         return edges
     }
-    
-    func findDifference(list1:[Edge],list2:[Edge]) {
-        for i1 in list1 {
-            var found = false
-            for i2 in list2 {
-                if (i1.node1.id == i2.node1.id && i1.node2.id == i2.node2.id) || (i1.node1.id == i2.node2.id && i1.node2.id == i2.node1.id){
-                    found = true
-                    break
-                }
-            }
-            if !found {
-                let r = connectionDistance
-                print(i1.node1,i1.node2, "    ", Int(i1.node1.x/r), Int(i1.node1.y/r), " --- ", Int(i1.node2.x/r), Int(i1.node2.y/r))
-            }
-        }
-    }
 
 
     func getAdjacencyList(nodes:[Node],edges:[Edge]) -> [[Node]]{
@@ -496,8 +479,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             adjList[edge.node1.id].append(edge.node2)
             adjList[edge.node2.id].append(edge.node1)
         }
-        
-//        print(adjList)
         
         return adjList
     }
@@ -514,18 +495,13 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
                 break
             }
             else {
-                //swap values to keep in order
-//                swap(&sortedList[i], &sortedList[i-1])
-                
                 //update reference list
                 referenceList[sortedList[i].0].1 = i
-//                referenceList[sortedList[i-1].0].1 = i-1
             }
             i += 1
         }
         sortedList.insert(value, at: i)
         referenceList[sortedList[i].0].1 = i
-//        print("Now:",referenceList[sortedList[i].0])
     }
     
     func subtractBucket(value:Int,buckets: inout [[Int]], referenceList: inout [([Int],Int)]) {
@@ -535,12 +511,9 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             //find node
             if nodeId == value {
                 //move node to lower bucket
-                
-//                print("Removing")
                 _ = buckets[ referenceList[value].1 ].remove(at: index)
                 referenceList[value].1 -= 1
                 buckets[ referenceList[value].1 ].append(value)
-//                print("Adding")
                 break
             }
         }
@@ -553,9 +526,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         
         let startTimeFaster = Date()
         
-        
-        
-        
         var newList:[[Node]] = []
         
         var buckets:[[Int]] = [[Int]](repeating: [], count: adjList.count-1)
@@ -565,7 +535,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         var maxDegree = 0
         var totalDegree = 0
         TERMINAL_CLIQUE_SIZE = 1
-//        var totalEntered = 0
         
         //put values in list
         for list in adjList {
@@ -579,7 +548,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
                 maxDegree = list.count-1
             }
             totalDegree += list.count-1
-//            totalEntered += 1
         }
         
         if shouldPrint {
@@ -606,16 +574,10 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             }
             
             
-//            let minVal = sortedList.popLast()
-//            print(minVal,newList.count,adjList.count,totalEntered)
-            
-            
             newList.append(adjList[minVal])
             DEGREE_WHEN_DELETED.append(referenceList[minVal].1)
             
             referenceList[minVal].1 = -1
-            
-//            let before = Date()
             
             let nodeList = referenceList[minVal].0
             ORIGINAL_DEGREE.append(nodeList.count)
@@ -634,7 +596,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
                 print("\nRemoving node: ",minVal)
                 print(buckets)
             }
-            //            print("UPDATE TIME: ", before.timeIntervalSinceNow)
         }
         
         
@@ -655,69 +616,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         return newList
     }
 
-    
-    func sortBySmallestLastDegree(adjList: [[Node]]) -> [[Node]] {
-        
-//        let startTime = Date()
-        
-        colorStats = []
-        DEGREE_WHEN_DELETED = []
-        
-        var newList:[[Node]] = []
-        
-        
-        var adjDict:[Int:([Node],Int)] = [:]
-        
-        var maxDegree = 0
-        var totalDegree = 0
-        for list in adjList {
-            adjDict[list[0].id] = (list,list.count)
-            if list.count-1 > maxDegree {
-                maxDegree = list.count-1
-            }
-            totalDegree += list.count-1
-        }
-        
-//        let midTime = Date()
-        
-        while adjDict.count > 0 {
-            var minDegree = 1000000
-            var minDegreeId = -1
-            for (k,v) in adjDict {
-                if v.1 < minDegree {
-                    minDegree = v.1
-                    minDegreeId = k
-                }
-            }
-            
-            let minVal = adjDict.removeValue(forKey: minDegreeId)
-            newList.append(minVal!.0)
-            DEGREE_WHEN_DELETED.append(minVal!.1 - 1)
-            for node in minVal!.0 {
-                if adjDict[node.id] != nil {
-                    adjDict[node.id]!.1 -= 1
-                }
-            }
-        }
-        
-        newList.reverse()
-        
-//        let endTime = Date()
-        
-        
-        colorStats.append( ("Min Degree",String(DEGREE_WHEN_DELETED[0])) )
-        colorStats.append( ("Avg Degree",String( round( Double( totalDegree ) / Double( newList.count ) * 1000 ) / 1000 ) ) )
-        colorStats.append( ("Max Degree",String(maxDegree)) )
-        colorStats.append( ( "Max Degree when Deleted",String( DEGREE_WHEN_DELETED.max()!  ) ) )
-        
-//        print("STATS",colorStats)
-//        
-//        print("SETUP TIME NORMAL: ",midTime.timeIntervalSince(startTime))
-//        print("REST OF TIME: ",endTime.timeIntervalSince(midTime))
-        
-        return newList
-    }
-    
     func colorGraph(adjList: [[Node]],shouldPrint:Bool=false) -> [Int] {
         
         COLORS = []
@@ -758,13 +656,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             }
         }
 
-        
-        //Loop until list is empty
-            //pop the lowest into new list
-        
-            //update all values it was connected to (or sort again but that's slow)
-        
-        
         var newNodes:[Node] = []
         for k in adjList {
             newNodes.append((k[0]))
@@ -824,13 +715,9 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             print(parts[0])
         }
         
-//        print("Max Edges: ",getMaxBipartiteGraphElements())
-//        let startTime1 = Date()
-        
         let beforeBipartite = Date()
         let maxEdges = getMaxBipartiteEdges()
         colorStats.append(("Max Edges in a Bipartite Subgraph",String(maxEdges)))
-//        print("Max Edges faster: ", maxEdges)round(10000*Float(maxMajorComponent.1)/Float(CURRENT_NODES.count))/100))
         bipartiteStats = []
         let maxMajorComponent = getMaxBipartiteGraphElements()
         
@@ -843,7 +730,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         if networkModel == "Sphere" {
             bipartiteStats.append(("Max Backbone Faces",String(maxMajorComponent.0-maxMajorComponent.1+2)))
         }
-//        bipartiteStats.append(("Max Backbone Colors",String(maxMajorComponent.2.0)+" and "+String(maxMajorComponent.2.1)))
         
         bipartiteStats.append(("2nd Max Backbone Vertices",String(maxMajorComponent.5)))
         bipartiteStats.append(("2nd Max Backbone Edges",String(maxMajorComponent.4)))
@@ -860,8 +746,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         
         TIME_FOR_BIPARTITE = afterBipartite.timeIntervalSince(beforeBipartite)
 
-//        let startTime2 = Date()
-//        print("Times: ", startTime1.timeIntervalSince(endTime), " | ",startTime2.timeIntervalSince(startTime1))
         generateColorValues()
         
         if networkModel == "Sphere" {
@@ -917,12 +801,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             for val in colorStats {
                 colorStatistics.append(val)
             }
-            
-//            statistics.append(("Average Degree",String(round(1000*2.0*Double(CURRENT_EDGES.count)/Double(CURRENT_NODES.count))/1000)))
-            
-            
-            
-            
 
             
             vc.bipartiteStats = self.bipartiteStats
@@ -930,8 +808,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             vc.colorStats = colorStatistics
             
             vc.title = self.title! + "  Stats"
-            
-            //            CURRENT_MODEL_INDEX = self.networkModelControl.selectedSegmentIndex
         }
     }
     
@@ -939,7 +815,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
     @IBOutlet weak var color1Button: UIButton!
     var color1:Int = -1
     var color2:Int = -1
-//    @IBOutlet var colorPicker: UIPickerView!
     @IBOutlet weak var colorPicker: UIPickerView!
     var selecting1 = false
     
@@ -1102,9 +977,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
         }
         
         
-        
-        
-        
         return (maxMajorCompSize,numberOfNodes,maxDominationPercentage,maxIndex,secondMaxSize,secondNumberOfNodes,secondDominationPercentage,secondMaxIndex)
     }
     
@@ -1117,8 +989,6 @@ class DisplayViewController: UIViewController,UIPickerViewDelegate, UIPickerView
             bipartiteEdges[edge.node2.color][edge.node1.color] += 1
         }
 
-        
-        
         var maxEdgeCount = 0
         
         for i in 0..<COLORS.count {

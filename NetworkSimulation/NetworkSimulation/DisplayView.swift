@@ -37,11 +37,8 @@ class DisplayView: UIView {
     
     var model = "Square"
     
-    
-    
     override func draw(_ rect: CGRect)
     {
-        
         xMax = Double(rect.size.width)
         yMax = Double(rect.size.height)
         
@@ -81,8 +78,6 @@ class DisplayView: UIView {
         ctx?.drawPath(using: .fillStroke)
     }
     
-    
-    
     func drawEdgeInSquare(obj:Edge) {
         let context = UIGraphicsGetCurrentContext()
         context?.setLineWidth(CGFloat(EDGE_WIDTH*2))
@@ -92,24 +87,4 @@ class DisplayView: UIView {
         context?.addLine(to: CGPoint(x: xMax*obj.node2.x, y: yMax*obj.node2.y))
         context?.strokePath()
     }
-    
-    //    func drawNodeInDisk(obj:Node) {
-    //        let ctx = UIGraphicsGetCurrentContext()
-    //        ctx?.setFillColor(COLOR_VALUES[obj.color].cgColor)
-    //        ctx?.setStrokeColor(COLOR_VALUES[obj.color].cgColor)
-    //        ctx?.setLineWidth(CGFloat(NODE_SIZE))
-    //
-    //        let rectangle = CGRect(x: xCenter+radius*obj.x-NODE_SIZE/2, y: yCenter+radius*obj.y-NODE_SIZE/2, width: NODE_SIZE, height: NODE_SIZE)
-    //        ctx?.addEllipse(in: rectangle)
-    //        ctx?.drawPath(using: .fillStroke)
-    //    }
-
-//    func drawEdgeInDisk(obj:Edge) {
-//        let context = UIGraphicsGetCurrentContext()
-//        context?.setLineWidth(CGFloat(EDGE_WIDTH))
-//        context?.setStrokeColor(obj.color.cgColor)
-//        context?.move(to: CGPoint(x: xCenter+radius*obj.node1.x, y: yCenter+radius*obj.node1.y))
-//        context?.addLine(to: CGPoint(x: xCenter+radius*obj.node2.x, y: yCenter+radius*obj.node2.y))
-//        context?.strokePath()
-//    }
 }

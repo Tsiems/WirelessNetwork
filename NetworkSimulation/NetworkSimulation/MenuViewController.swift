@@ -19,9 +19,6 @@ class MenuViewController: UIViewController {
         //Looks for single or multiple taps.
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MenuViewController.dismissKeyboard))
         
-        //Uncomment the line below if you want the tap not not interfere and cancel other interactions.
-        //tap.cancelsTouchesInView = false
-        
         view.addGestureRecognizer(tap)
         
         self.displayNetworkSwitch.isOn = false
@@ -122,10 +119,6 @@ class MenuViewController: UIViewController {
     }
     @IBAction func networkModelChanged(_ sender: UISegmentedControl) {
         //reset selected nodes to the number that will actually be generated
-//        if self.networkModelControl.selectedSegmentIndex != CURRENT_MODEL_INDEX {
-//            self.nodeNumberSlider.value = Float(CURRENT_NODES.count)
-//            self.nodeNumberLabel.text = String(Int(self.nodeNumberSlider.value))
-//        }
         self.nodeNumberLabel.text = String(Int(self.nodeNumberSlider.value))
         displayAdjacencyValue()
         self.newValuesSwitch.isOn = true
@@ -202,32 +195,7 @@ class MenuViewController: UIViewController {
             
             vc.title = String(vc.nodeCount)+" vertices, "+String(vc.averageDegree)+" Avg. Degree"
             vc.title = "|V| = "+String(vc.nodeCount)+" ,  Avg. Degree = "+self.adjacencyLabel.text!
-//            CURRENT_MODEL_INDEX = self.networkModelControl.selectedSegmentIndex
         }
     }
-    
-//    func addDoneButtonOnKeyboard()
-//    {
-//        let doneToolbar: UIToolbar = UIToolbar(frame:  CGRect(x:0, y:0, width:320, height:50))
-//        doneToolbar.barStyle = UIBarStyle.default
-//        
-//        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
-//        let done: UIBarButtonItem = UIBarButtonItem(title: "Aceptar", style: UIBarButtonItemStyle.done, target: self, action: #selector(MenuViewController.doneButtonAction))
-//        
-//        var items = [UIBarButtonItem]()
-//        items.append(flexSpace)
-//        items.append(done)
-//        
-//        doneToolbar.items = items
-//        doneToolbar.sizeToFit()
-//        
-//        self.adjacencyLabel.inputAccessoryView = doneToolbar
-//        
-//    }
-//    
-//    func doneButtonAction()
-//    {
-//        self.adjacencyTypeLabel.resignFirstResponder()
-//    }
 
 }

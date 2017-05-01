@@ -12,10 +12,8 @@ class Node: NSObject {
     var x: Double = 0.0
     var y: Double = 0.0
     var z: Double = 0.0
-//    var color: UIColor = UIColor.blue
     var color:Int = 0
     var id: Int = -1
-    var countOfConnectedNodes = 0
     
     init(x:Double,y:Double,z:Double=0.0,id:Int,color:Int) {
         self.x = x
